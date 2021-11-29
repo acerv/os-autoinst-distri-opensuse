@@ -66,14 +66,16 @@ sub install_testsuite {
 sub setup_nfs_server {
     my $nfsversion = shift;
     assert_script_run('mkdir -p /exportdir && echo \'/exportdir *(rw,no_root_squash,insecure)\' >> /etc/exports');
-    assert_script_run("echo 'options lockd nlm_grace_period=15' >> /etc/modprobe.d/lockd.conf && echo 'options lockd nlm_timeout=5' >> /etc/modprobe.d/lockd.conf");
+
+    my $nfsgrace = get_var('NFS_GRACE_TIME', 15);
+    assert_script_run("echo 'options lockd nlm_grace_period=$nfsgrace' >> /etc/modprobe.d/lockd.conf && echo 'options lockd nlm_timeout=5' >> /etc/modprobe.d/lockd.conf");
     if ($nfsversion == '3') {
         assert_script_run("echo 'MOUNT_NFS_V3=\"yes\"' >> /etc/sysconfig/nfs");
         assert_script_run("echo 'MOUNT_NFS_DEFAULT_PROTOCOL=3' >> /etc/sysconfig/autofs && echo 'OPTIONS=\"-O vers=3\"' >> /etc/sysconfig/autofs");
         assert_script_run("echo 'Defaultvers=3' >> /etc/nfsmount.conf && echo 'Nfsvers=3' >> /etc/nfsmount.conf");
     }
     else {
-        assert_script_run("echo 'NFSD_V4_GRACE=15' >> /etc/sysconfig/nfs && echo 'NFSD_V4_LEASE=15' >> /etc/sysconfig/nfs");
+        assert_script_run("echo 'NFSD_V4_GRACE=$nfsgrace' >> /etc/sysconfig/nfs && echo 'NFSD_V4_LEASE=$nfsgrace' >> /etc/sysconfig/nfs");
     }
     assert_script_run('systemctl restart rpcbind && systemctl enable nfs-server.service && systemctl restart nfs-server');
 
