@@ -38,6 +38,7 @@
       <li><a href="#ssh_fully_patch_system">ssh_fully_patch_system</a></li>
       <li><a href="#minimal_patch_system">minimal_patch_system</a></li>
       <li><a href="#zypper_search">zypper_search</a></li>
+      <li><a href="#set_zypper_lock_timeout">set_zypper_lock_timeout</a></li>
       <li><a href="#workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</a></li>
       <li><a href="#is_boot_encrypted">is_boot_encrypted</a></li>
       <li><a href="#is_bridged_networking">is_bridged_networking</a></li>
@@ -47,6 +48,7 @@
       <li><a href="#handle_livecd_reboot_failure">handle_livecd_reboot_failure</a></li>
       <li><a href="#assert_screen_with_soft_timeout">assert_screen_with_soft_timeout</a></li>
       <li><a href="#quit_packagekit">quit_packagekit</a></li>
+      <li><a href="#wait_for_purge_kernels">wait_for_purge_kernels</a></li>
       <li><a href="#addon_decline_license">addon_decline_license</a></li>
       <li><a href="#addon_license">addon_license</a></li>
       <li><a href="#addon_products_is_applicable">addon_products_is_applicable</a></li>
@@ -64,12 +66,14 @@
       <li><a href="#exec_and_insert_password">exec_and_insert_password</a></li>
       <li><a href="#shorten_url">shorten_url</a></li>
       <li><a href="#handle_login_not_found">_handle_login_not_found</a></li>
+      <li><a href="#handle_firewall">_handle_firewall</a></li>
       <li><a href="#reconnect_mgmt_console">reconnect_mgmt_console</a></li>
       <li><a href="#show_tasks_in_blocked_state">show_tasks_in_blocked_state</a></li>
       <li><a href="#show_oom_info">show_oom_info</a></li>
       <li><a href="#svirt_host_basedir">svirt_host_basedir</a></li>
       <li><a href="#script_retry">script_retry</a></li>
       <li><a href="#script_output_retry">script_output_retry</a></li>
+      <li><a href="#validate_script_output_retry">validate_script_output_retry</a></li>
       <li><a href="#script_run_interactive">script_run_interactive</a></li>
       <li><a href="#create_btrfs_subvolume">create_btrfs_subvolume</a></li>
       <li><a href="#create_raid_loop_device">create_raid_loop_device</a></li>
@@ -80,6 +84,7 @@
       <li><a href="#permit_root_ssh-permit_root_ssh">permit_root_ssh permit_root_ssh();</a></li>
       <li><a href="#permit_root_ssh_in_sol-permit_root_ssh_in_sol">permit_root_ssh_in_sol permit_root_ssh_in_sol();</a></li>
       <li><a href="#cleanup_disk_space-cleanup_disk_space">cleanup_disk_space cleanup_disk_space();</a></li>
+      <li><a href="#package_upgrade_check-package_upgrade_check">package_upgrade_check package_upgrade_check();</a></li>
     </ul>
   </li>
 </ul><h1>lib/utils.pm</h1>
@@ -282,6 +287,12 @@
 
 <p>Run zypper search with given command line arguments and parse the output into an array of hashes.</p>
 
+<h2 id="set_zypper_lock_timeout">set_zypper_lock_timeout</h2>
+
+<pre><code> set_zypper_lock_timeout($timeout);</code></pre>
+
+<p>Set how many seconds zypper will wait for other processes to release the system lock. If this function is called without arguments, it&#39;ll set timeout to 300 seconds.</p>
+
 <h2 id="workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</h2>
 
 <pre><code> workaround_type_encrypted_passphrase();</code></pre>
@@ -320,6 +331,8 @@
 
 <p>This will repeat <code>assert_and_click($mustmatch)</code> up to <code>$repeat</code> times, trying againg if the screen has not changed within <code>$wait_change</code> seconds after the <code>assert_and_click</code>. Returns the number of attempts made. <code>$wait_change</code> defaults to 2 (seconds) and <code>$repeat</code> defaults to 3.</p>
 
+<p>You can check if the screen changed by using an explicit repeat and comparing it to the returned number of attempts. If the value equals repeat the screen didn&#39;t change.</p>
+
 <h2 id="handle_livecd_reboot_failure">handle_livecd_reboot_failure</h2>
 
 <pre><code> handle_livecd_reboot_failure();</code></pre>
@@ -343,6 +356,12 @@
 <pre><code> quit_packagekit();</code></pre>
 
 <p>Stop and mask packagekit service and wait until it is really dead. This is needed to prevent access conflicts to the RPM database.</p>
+
+<h2 id="wait_for_purge_kernels">wait_for_purge_kernels</h2>
+
+<pre><code> wait_for_purge_kernels();</code></pre>
+
+<p>Wait until purge-kernels is done Prevent RPM lock e.g. SUSEConnect fail</p>
 
 <h2 id="addon_decline_license">addon_decline_license</h2>
 
@@ -458,6 +477,12 @@
 
 <p>Internal helper function used by <code>reconnect_mgmt_console</code>.</p>
 
+<h2 id="handle_firewall">_handle_firewall</h2>
+
+<pre><code> _handle_firewall();</code></pre>
+
+<p>Internal helper function used by <code>reconnect_mgmt_console</code>.</p>
+
 <h2 id="reconnect_mgmt_console">reconnect_mgmt_console</h2>
 
 <pre><code> reconnect_mgmt_console([timeout =&gt; $timeout]);</code></pre>
@@ -523,6 +548,22 @@
 <p>Example:</p>
 
 <pre><code> script_output_retry(&#39;ping -c1 -W1 machine&#39;, retry =&gt; 5);</code></pre>
+
+<h2 id="validate_script_output_retry">validate_script_output_retry</h2>
+
+<pre><code> validate_script_output_retry($cmd, $check, [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout]);</code></pre>
+
+<p>Repeat command until validate_script_output succeeds or die. Return the output of the command on success.</p>
+
+<p><code>$retry</code> refers to the number of retries and defaults to <code>10</code>.</p>
+
+<p><code>$delay</code> is the time between retries and defaults to <code>30</code>.</p>
+
+<p>If the command doesn&#39;t succeed after <code>$retry</code> retries, this function will die.</p>
+
+<p>Example:</p>
+
+<pre><code> validate_script_output_retry(&#39;ping -c1 -W1 machine&#39;, m/1 packets transmitted/, retry =&gt; 5, delay =&gt; 60);</code></pre>
 
 <h2 id="script_run_interactive">script_run_interactive</h2>
 
@@ -593,6 +634,12 @@
 <h2 id="cleanup_disk_space-cleanup_disk_space">cleanup_disk_space cleanup_disk_space();</h2>
 
 <p>In fully_patch_system and minimal_patch_system, we&#39;ll create so many snapshots. which will cost large part of the disk space. We need to delete these snapshots before the migration only if the available space is less than DISK_LOW_WATERMARK.</p>
+
+<h2 id="package_upgrade_check-package_upgrade_check">package_upgrade_check package_upgrade_check();</h2>
+
+<p>This function is used for checking if the package is upgraded to the required version</p>
+
+<p>Sample config of parameter of the function below: my $pkg_list = {ibmtss =&gt; &#39;1.6.0&#39;}; here, &#39;libmtss&#39; is the package name, and &#39;1.6.0&#39; is target version which needs to be upgrated to</p>
 
 
 </body>

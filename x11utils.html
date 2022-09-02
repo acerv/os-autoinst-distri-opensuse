@@ -22,13 +22,15 @@
       <li><a href="#handle_logout">handle_logout</a></li>
       <li><a href="#handle_relogin">handle_relogin</a></li>
       <li><a href="#select_user_gnome">select_user_gnome</a></li>
+      <li><a href="#turn_off_plasma_screen_energysaver">turn_off_plasma_screen_energysaver</a></li>
+      <li><a href="#turn_off_plasma_screenlocker">turn_off_plasma_screenlocker</a></li>
       <li><a href="#turn_off_kde_screensaver">turn_off_kde_screensaver</a></li>
       <li><a href="#turn_off_gnome_screensaver">turn_off_gnome_screensaver</a></li>
       <li><a href="#turn_off_gnome_screensaver_for_gdm">turn_off_gnome_screensaver_for_gdm</a></li>
+      <li><a href="#turn_off_gnome_screensaver_for_running_gdm">turn_off_gnome_screensaver_for_running_gdm</a></li>
       <li><a href="#turn_off_gnome_suspend">turn_off_gnome_suspend</a></li>
       <li><a href="#turn_off_screensaver">turn_off_screensaver</a></li>
       <li><a href="#untick_welcome_on_next_startup">untick_welcome_on_next_startup</a></li>
-      <li><a href="#workaround_broken_opensuse_welcome_window">workaround_broken_opensuse_welcome_window</a></li>
       <li><a href="#handle_welcome_screen">handle_welcome_screen</a></li>
       <li><a href="#start_root_shell_in_xterm">start_root_shell_in_xterm</a></li>
       <li><a href="#handle_gnome_activities">handle_gnome_activities</a></li>
@@ -88,11 +90,23 @@
 
 <p>Handle the case when user is not selected in login screen, on gnome. <code>$myuser</code> specifies the username to switch to. If not set, it will default to <code>$username</code>.</p>
 
+<h2 id="turn_off_plasma_screen_energysaver">turn_off_plasma_screen_energysaver</h2>
+
+<pre><code> turn_off_plasma_screen_energysaver()</code></pre>
+
+<p>Turns off the Plasma desktop screen energy saving.</p>
+
+<h2 id="turn_off_plasma_screenlocker">turn_off_plasma_screenlocker</h2>
+
+<pre><code> turnoff_plasma_screenlocker()</code></pre>
+
+<p>Turns off the Plasma desktop screenlocker.</p>
+
 <h2 id="turn_off_kde_screensaver">turn_off_kde_screensaver</h2>
 
-<pre><code> turn_off_kde_screensaver();</code></pre>
+<pre><code>  turn_off_kde_screensaver()</code></pre>
 
-<p>Turns off the screensaver on KDE</p>
+<p>Prevents screen from being locked or turning black while using the Plasma desktop. Call before tests that are not providing input for a long time, to prevent needles from failing.</p>
 
 <h2 id="turn_off_gnome_screensaver">turn_off_gnome_screensaver</h2>
 
@@ -105,6 +119,12 @@
 <p>turn_off_gnome_screensaver_for_gdm()</p>
 
 <p>Disable screensaver in gnome for gdm. The function should be run under root. To be called from a command prompt, for example an xterm window.</p>
+
+<h2 id="turn_off_gnome_screensaver_for_running_gdm">turn_off_gnome_screensaver_for_running_gdm</h2>
+
+<p>turn_off_gnome_screensaver_for_running_gdm()</p>
+
+<p>Disable screensaver in gnome for running gdm. The function should be run under root. To be called from a command prompt, for example an xterm window.</p>
 
 <h2 id="turn_off_gnome_suspend">turn_off_gnome_suspend</h2>
 
@@ -123,12 +143,6 @@
 <pre><code> untick_welcome_on_next_startup();</code></pre>
 
 <p>untick welcome page on next startup.</p>
-
-<h2 id="workaround_broken_opensuse_welcome_window">workaround_broken_opensuse_welcome_window</h2>
-
-<pre><code> workaround_broken_opensuse_welcome_window();</code></pre>
-
-<p>Kill broken opensuse-welcome window and restart it properly to workaround boo#1170586.</p>
 
 <h2 id="handle_welcome_screen">handle_welcome_screen</h2>
 

@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>YuiRestClient::Widget::Button - Handle YQWizardButton, YPushButton</title>
+<title>YuiRestClient::Widget::ProgressBar - handle progress bars</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rel='stylesheet' href='../../style.css' />
 </head>
@@ -22,15 +22,15 @@
       <li><a href="#Class-and-object-methods">Class and object methods</a></li>
     </ul>
   </li>
-</ul><h1>lib/YuiRestClient/Widget/Button.pm</h1>
+</ul><h1>lib/YuiRestClient/Widget/ProgressBar.pm</h1>
 
 <h1 id="NAME">NAME</h1>
 
-<p>YuiRestClient::Widget::Button - Handle YQWizardButton, YPushButton</p>
+<p>YuiRestClient::Widget::ProgressBar - handle progress bars</p>
 
 <h1 id="COPYRIGHT">COPYRIGHT</h1>
 
-<p>Copyright 2020 SUSE LLC</p>
+<p>Copyright 2021 SUSE LLC</p>
 
 <p>SPDX-License-Identifier: FSFAP</p>
 
@@ -40,33 +40,26 @@
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<p>$self-&gt;{btn_next}-&gt;click()</p>
-
-<p>$self-&gt;{button}-&gt;is_enabled()</p>
+<p>$self-&gt;{pba_total_packages}-&gt;value(); $self-&gt;{pba_total_packages}-&gt;max_value();</p>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
 <h2 id="Overview">Overview</h2>
 
-<p>This class provides methods to interact with libyui button objects.</p>
+<p>Class to represent a progress bar. It can be YProgressBar.</p>
+
+<pre><code>    {
+       &quot;class&quot;: &quot;YProgressBar&quot;,
+       &quot;hstretch&quot; : true,
+       &quot;id&quot; : &quot;initProg&quot;,
+       &quot;label&quot; : &quot;Disk&quot;,
+       &quot;max_value&quot; : 1000,
+       &quot;value&quot; : 666
+    }</code></pre>
 
 <h2 id="Class-and-object-methods">Class and object methods</h2>
 
-<p><b>click()</b> - Send a press event to a button</p>
-
-<p>The button object receives a press event.</p>
-
-<p><b>is_enabled()</b> - Check if button is enabled</p>
-
-<ul>
-
-<li><p>If the button object has a property &#39;enabled&#39; then the value of this property is returned</p>
-
-</li>
-<li><p>If the button object has no property &#39;enabled&#39; then it is considered to be enabled by default</p>
-
-</li>
-</ul>
+<p><b>value()</b> - returns the current string stored in the &quot;value&quot; property. <b>max_value()</b> - returns the current string stored in the &quot;max_value&quot; property.</p>
 
 
 </body>
