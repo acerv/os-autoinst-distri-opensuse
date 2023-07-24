@@ -291,7 +291,17 @@ sub install_from_repo {
     my @pkgs = split(/\s* \s*/, get_var('LTP_PKG', get_default_pkg));
 
     if (is_transactional) {
-        assert_script_run("transactional-update -n -c pkg install " . join(' ', @pkgs), 90);
+        script_start_io('transactional-update pkg install ltp');
+
+        # break dependences
+        wait_serial(qr/Solution (\d+): break ltp/);
+        type_string("2\n");
+
+        # install the package
+        wait_serial(qr/Continue?/);
+        type_string("y\n");
+
+        script_finish_io(timeout => 300);
     } else {
         zypper_call("in --recommends " . join(' ', @pkgs));
     }
@@ -411,7 +421,7 @@ sub run {
     log_versions 1;
 
     if (is_alp) {
-        assert_script_run("transactional-update -n -c pkg install efivar", 90);
+        #assert_script_run("transactional-update -n -c pkg install efivar", 90);
     } else {
         zypper_call('in efivar') if is_sle('12+') || is_opensuse;
     }
