@@ -37,12 +37,16 @@
       <li><a href="#fully_patch_system">fully_patch_system</a></li>
       <li><a href="#ssh_fully_patch_system">ssh_fully_patch_system</a></li>
       <li><a href="#minimal_patch_system">minimal_patch_system</a></li>
+      <li><a href="#parse_zypper_table">parse_zypper_table</a></li>
       <li><a href="#zypper_search">zypper_search</a></li>
+      <li><a href="#zypper_repos">zypper_repos</a></li>
+      <li><a href="#zypper_patches">zypper_patches</a></li>
       <li><a href="#set_zypper_lock_timeout">set_zypper_lock_timeout</a></li>
       <li><a href="#workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</a></li>
       <li><a href="#is_boot_encrypted">is_boot_encrypted</a></li>
       <li><a href="#is_bridged_networking">is_bridged_networking</a></li>
       <li><a href="#set_bridged_networking">set_bridged_networking</a></li>
+      <li><a href="#print_ip_info">print_ip_info</a></li>
       <li><a href="#set_hostname">set_hostname</a></li>
       <li><a href="#assert_and_click_until_screen_change">assert_and_click_until_screen_change</a></li>
       <li><a href="#handle_livecd_reboot_failure">handle_livecd_reboot_failure</a></li>
@@ -85,6 +89,16 @@
       <li><a href="#permit_root_ssh_in_sol-permit_root_ssh_in_sol">permit_root_ssh_in_sol permit_root_ssh_in_sol();</a></li>
       <li><a href="#cleanup_disk_space-cleanup_disk_space">cleanup_disk_space cleanup_disk_space();</a></li>
       <li><a href="#package_upgrade_check-package_upgrade_check">package_upgrade_check package_upgrade_check();</a></li>
+      <li><a href="#validate_result-_validate_result">_validate_result _validate_result();</a></li>
+      <li><a href="#generate_results-generate_results">generate_results generate_results();</a></li>
+      <li><a href="#pars_results-pars_results">pars_results pars_results();</a></li>
+      <li><a href="#test_case-test_case-name-description-result">test_case test_case($name, $description, $result);</a></li>
+      <li><a href="#remount_tmp_if_ro">remount_tmp_if_ro</a></li>
+      <li><a href="#detect_bsc_1063638">detect_bsc_1063638</a></li>
+      <li><a href="#script_start_io">script_start_io</a></li>
+      <li><a href="#script_finish_io">script_finish_io</a></li>
+      <li><a href="#handle_screen-handle_screen-needles-handler_map-assert-assert-max_loops-max_loops">handle_screen handle_screen($needles, $handler_map [, assert =&gt; $assert] [, max_loops =&gt; $max_loops] [...]);</a></li>
+      <li><a href="#define_secret_variable-define_secret_variable-var_name-var_value-define_secret_variable-sets-a-hidden-environment-variable-without-exposing-it-to-openQA.-This-function-is-useful-to-hide-secrets-from-openQA-by-setting-them-as-an-accessible-environment-variable-but-without-any-traces-in-the-output-terminals.-e.g.-define_secret_variable-SECRET-get_var-_SECRET_VARIABLE-would-store-the-openQA-variable-_SECRET_VARIABLE-into-the-SECRET-environment-variable-which-can-be-used-afterwards-by-using-SECRET">define_secret_variable define_secret_variable($var_name, $var_value); define_secret_variable sets a hidden environment variable without exposing it to openQA. This function is useful to hide secrets from openQA by setting them as an accessible environment variable, but without any traces in the output terminals. e.g. define_secret_variable(&#39;SECRET&#39;, get_var(&#39;_SECRET_VARIABLE&#39;)) would store the openQA variable &#39;_SECRET_VARIABLE&#39; into the &#39;$SECRET&#39; environment variable, which can be used afterwards by using $SECRET.</a></li>
     </ul>
   </li>
 </ul><h1>lib/utils.pm</h1>
@@ -95,7 +109,7 @@
 
 <h2 id="save_svirt_pty">save_svirt_pty</h2>
 
-<pre><code> save_svirt_pty();</code></pre>
+<pre><code>save_svirt_pty();</code></pre>
 
 <p>Save the pty device within the svirt shell session so that we can refer to the correct pty pointing to the first tty, e.g. for password entry for encrypted partitions and rewriting the network definition of zKVM instances.</p>
 
@@ -103,19 +117,19 @@
 
 <h2 id="type_line_svirt">type_line_svirt</h2>
 
-<pre><code> type_line_svirt($string [, expect =&gt; $expect] [, timeout =&gt; $timeout] [, fail_message =&gt; $fail_message]);</code></pre>
+<pre><code>type_line_svirt($string [, expect =&gt; $expect] [, timeout =&gt; $timeout] [, fail_message =&gt; $fail_message]);</code></pre>
 
 <p>Sends <code>$string</code> to the svirt terminal, waits up to <code>$timeout</code> seconds and expects <code>$expect</code> to be returned on the terminal if <code>$expect</code> is set. If the expected text is not found, it will fail with <code>$fail_message</code>.</p>
 
 <h2 id="unlock_zvm_disk">unlock_zvm_disk</h2>
 
-<pre><code> unlock_zvm_disk($console);</code></pre>
+<pre><code>unlock_zvm_disk($console);</code></pre>
 
 <p>Unlock the zvm disk if needed. <code>$console</code> should be set to <code>console(&#39;x3270&#39;)</code>. <code>$testapi::password</code> will be used as password.</p>
 
 <h2 id="handle_grub_zvm">handle_grub_zvm</h2>
 
-<pre><code> handle_grub_zvm($console);</code></pre>
+<pre><code>handle_grub_zvm($console);</code></pre>
 
 <p>Make sure that grub was started and send four enter keys to boot the system. <code>$console</code> should be set to <code>console(&#39;x3270&#39;)</code>.</p>
 
@@ -123,37 +137,37 @@
 
 <h2 id="handle_untrusted_gpg_key">handle_untrusted_gpg_key</h2>
 
-<pre><code> handle_untrusted_gpg_key();</code></pre>
+<pre><code>handle_untrusted_gpg_key();</code></pre>
 
 <p>This function is used during the installation. Check if a previous needle match included the tag <code>import-known-untrusted-gpg-key</code>. If yes, import the key, otherwise don&#39;t.</p>
 
 <h2 id="integration_services_check_ip">integration_services_check_ip</h2>
 
-<pre><code> integration_services_check_ip();</code></pre>
+<pre><code>integration_services_check_ip();</code></pre>
 
 <p>Check that guest IP address that host and guest see is the same. Die, if this is not the case.</p>
 
 <h2 id="integration_services_check">integration_services_check</h2>
 
-<pre><code> integration_services_check();</code></pre>
+<pre><code>integration_services_check();</code></pre>
 
 <p>Make sure integration services (e.g. kernel modules, utilities, services) are present and in working condition.</p>
 
 <h2 id="unlock_if_encrypted">unlock_if_encrypted</h2>
 
-<pre><code> unlock_if_encrypted([check_typed_password =&gt; $check_typed_password]);</code></pre>
+<pre><code>unlock_if_encrypted([check_typed_password =&gt; $check_typed_password]);</code></pre>
 
 <p>Check whether the system under test has an encrypted partition and attempts to unlock it. <code>$check_typed_password</code> will default to <code>0</code>.</p>
 
 <h2 id="clear_console">clear_console</h2>
 
-<pre><code> clear_console();</code></pre>
+<pre><code>clear_console();</code></pre>
 
 <p><code>ctrl-l</code> does not get queued up in buffer. If this happens to fast, the screen would not be cleared. So this function will simply type <code>clear\n</code>.</p>
 
 <h2 id="assert_gui_app">assert_gui_app</h2>
 
-<pre><code> assert_gui_app($application [, install =&gt; $install] [, exec_param =&gt; $exec_param] [, remain =&gt; $remain]);</code></pre>
+<pre><code>assert_gui_app($application [, install =&gt; $install] [, exec_param =&gt; $exec_param] [, remain =&gt; $remain]);</code></pre>
 
 <p>assert_gui_app (optionally installs and) starts an application, checks it started and closes it again. It&#39;s the most minimalistic way to test a GUI application</p>
 
@@ -161,22 +175,22 @@
 
 <p>Optional parameters are:</p>
 
-<pre><code> install: boolean
-     Does the application have to be installed first? Especially
-     on live images where we want to ensure the disks are complete
-     the parameter should not be set to true - otherwise we might
-     mask the fact that the app is not on the media.
+<pre><code>install: boolean
+    Does the application have to be installed first? Especially
+    on live images where we want to ensure the disks are complete
+    the parameter should not be set to true - otherwise we might
+    mask the fact that the app is not on the media.
 
- exec_param: string
-     When calling the application, pass this parameter on the command line.
+exec_param: string
+    When calling the application, pass this parameter on the command line.
 
- remain: boolean
-     If set to true, do not close the application when tested it is
-     running. This can be used if the application shall be tested further.</code></pre>
+remain: boolean
+    If set to true, do not close the application when tested it is
+    running. This can be used if the application shall be tested further.</code></pre>
 
 <h2 id="check_console_font">check_console_font</h2>
 
-<pre><code> check_console_font();</code></pre>
+<pre><code>check_console_font();</code></pre>
 
 <p>Check the console font using a needle.</p>
 
@@ -184,19 +198,19 @@
 
 <h2 id="type_string_slow_extended">type_string_slow_extended</h2>
 
-<pre><code> type_string_slow_extended($string);</code></pre>
+<pre><code>type_string_slow_extended($string);</code></pre>
 
 <p>Enable additional arguments for nested calls of <code>wait_still_screen</code>.</p>
 
 <h2 id="type_string_slow">type_string_slow</h2>
 
-<pre><code> type_string_slow($string);</code></pre>
+<pre><code>type_string_slow($string);</code></pre>
 
 <p>Typing a string with <code>SLOW_TYPING_SPEED</code> to avoid losing keys.</p>
 
 <h2 id="type_string_very_slow">type_string_very_slow</h2>
 
-<pre><code> type_string_very_slow($string);</code></pre>
+<pre><code>type_string_very_slow($string);</code></pre>
 
 <p>Typing a string even slower with <code>VERY_SLOW_TYPING_SPEED</code>.</p>
 
@@ -204,47 +218,47 @@
 
 <h2 id="enter_cmd_slow">enter_cmd_slow</h2>
 
-<pre><code> enter_cmd_slow($cmd);</code></pre>
+<pre><code>enter_cmd_slow($cmd);</code></pre>
 
 <p>Enter a command with <code>SLOW_TYPING_SPEED</code> to avoid losing keys.</p>
 
 <h2 id="enter_cmd_very_slow">enter_cmd_very_slow</h2>
 
-<pre><code> enter_cmd_very_slow($cmd);</code></pre>
+<pre><code>enter_cmd_very_slow($cmd);</code></pre>
 
 <p>Enter a command even slower with <code>VERY_SLOW_TYPING_SPEED</code>. Compare to <code>type_string_very_slow</code>.</p>
 
 <h2 id="get_netboot_mirror">get_netboot_mirror</h2>
 
-<pre><code> get_netboot_mirror();</code></pre>
+<pre><code>get_netboot_mirror();</code></pre>
 
 <p>Return the mirror URL eg from the <code>MIRROR_HTTP</code> var if <code>INSTALL_SOURCE</code> is set to <code>http</code>.</p>
 
 <h2 id="zypper_call">zypper_call</h2>
 
-<pre><code> zypper_call($command [, exitcode =&gt; $exitcode] [, timeout =&gt; $timeout] [, log =&gt; $log] [, dumb_term =&gt; $dumb_term]);</code></pre>
+<pre><code>zypper_call($command [, exitcode =&gt; $exitcode] [, timeout =&gt; $timeout] [, log =&gt; $log] [, dumb_term =&gt; $dumb_term]);</code></pre>
 
 <p>Function wrapping &#39;zypper -n&#39; with allowed return code, timeout and logging facility. First parammeter is required command, all others are named and provided as hash for example:</p>
 
-<pre><code> zypper_call(&quot;up&quot;, exitcode =&gt; [0,102,103], log =&gt; &quot;zypper.log&quot;);
+<pre><code>zypper_call(&quot;up&quot;, exitcode =&gt; [0,102,103], log =&gt; &quot;zypper.log&quot;);
 
- # up        --&gt; zypper -n up --&gt; update system
- # exitcode  --&gt; allowed return code values
- # log       --&gt; capture log and store it in zypper.log
- # dumb_term --&gt; pipes through cat if set to 1 and log is not set. This is a  workaround
- #               to get output without any ANSI characters in zypper before 1.14.1. See boo#1055315.</code></pre>
+# up        --&gt; zypper -n up --&gt; update system
+# exitcode  --&gt; allowed return code values
+# log       --&gt; capture log and store it in zypper.log
+# dumb_term --&gt; pipes through cat if set to 1 and log is not set. This is a  workaround
+#               to get output without any ANSI characters in zypper before 1.14.1. See boo#1055315.</code></pre>
 
 <p><code>dumb_term</code> will default to <code>is_serial_terminal()</code>.</p>
 
 <h2 id="zypper_enable_install_dvd">zypper_enable_install_dvd</h2>
 
-<pre><code> zypper_enable_install_dvd();</code></pre>
+<pre><code>zypper_enable_install_dvd();</code></pre>
 
 <p>Enables the install DVDs if they were used during the installation.</p>
 
 <h2 id="zypper_ar">zypper_ar</h2>
 
-<pre><code> zypper_ar($url, [ name =&gt; NAME ], [ priority =&gt; N ]);</code></pre>
+<pre><code>zypper_ar($url, [ name =&gt; NAME ], [ priority =&gt; N ]);</code></pre>
 
 <p>Add repository (with <code>zypper ar</code>) unless it&#39;s already repo <code>$name</code> already added and refresh repositories.</p>
 
@@ -260,66 +274,90 @@
 
 <p>Examples:</p>
 
-<pre><code> zypper_ar(&#39;http://dist.nue.suse.com/ibs/QA:/Head/SLE-15-SP1&#39;, name =&gt; &#39;qa-head);
- zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_Tumbleweed/devel:kubic.repo&#39;, no_gpg_check =&gt; 1, priority =&gt; 90);</code></pre>
+<pre><code>zypper_ar(&#39;http://dist.nue.suse.com/ibs/QA:/Head/SLE-15-SP1&#39;, name =&gt; &#39;qa-head);
+zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_Tumbleweed/devel:kubic.repo&#39;, no_gpg_check =&gt; 1, priority =&gt; 90);</code></pre>
 
 <h2 id="fully_patch_system">fully_patch_system</h2>
 
-<pre><code> fully_patch_system();</code></pre>
+<pre><code>fully_patch_system();</code></pre>
 
 <p>Run <code>zypper patch</code> twice. The first run will update the package manager, the second run will update the system.</p>
 
 <h2 id="ssh_fully_patch_system">ssh_fully_patch_system</h2>
 
-<pre><code> ssh_fully_patch_system($host);</code></pre>
+<pre><code>ssh_fully_patch_system($host);</code></pre>
 
 <p>Connect to the remote host <code>$host</code> using ssh and update the system by running <code>zypper patch</code> twice. The first run will update the package manager, the second run will update the system.</p>
 
 <h2 id="minimal_patch_system">minimal_patch_system</h2>
 
-<pre><code> minimal_patch_system([version_variable =&gt; $version_variable]);</code></pre>
+<pre><code>minimal_patch_system([version_variable =&gt; $version_variable]);</code></pre>
 
 <p>zypper doesn&#39;t offer --updatestack-only option before 12-SP1, use patch for sp0 to update packager</p>
 
+<h2 id="parse_zypper_table">parse_zypper_table</h2>
+
+<pre><code>parse_zypper_table($table, $fields);</code></pre>
+
+<p>Parse ASCII table generated by commands such as <code>zypper search</code> into an array of hashes. Pass the ASCII table in <code>$table</code> as a single string. Pass an array of hash keys in <code>$fields</code>. Keys will be mapped to columns by position.</p>
+
 <h2 id="zypper_search">zypper_search</h2>
 
-<pre><code> zypper_search($search_params);</code></pre>
+<pre><code>zypper_search($search_params);</code></pre>
 
-<p>Run zypper search with given command line arguments and parse the output into an array of hashes.</p>
+<p>Run <code>zypper search</code> with given command line arguments and parse the output into an array of hashes.</p>
+
+<h2 id="zypper_repos">zypper_repos</h2>
+
+<pre><code>zypper_repos($params);</code></pre>
+
+<p>Run <code>zypper repos</code> with given command line arguments and parse the output into an array of hashes. Only table output is supported.</p>
+
+<h2 id="zypper_patches">zypper_patches</h2>
+
+<pre><code>zypper_patches($params);</code></pre>
+
+<p>Run <code>zypper patches</code> with given command line arguments and parse the output into an array of hashes.</p>
 
 <h2 id="set_zypper_lock_timeout">set_zypper_lock_timeout</h2>
 
-<pre><code> set_zypper_lock_timeout($timeout);</code></pre>
+<pre><code>set_zypper_lock_timeout($timeout);</code></pre>
 
 <p>Set how many seconds zypper will wait for other processes to release the system lock. If this function is called without arguments, it&#39;ll set timeout to 300 seconds.</p>
 
 <h2 id="workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</h2>
 
-<pre><code> workaround_type_encrypted_passphrase();</code></pre>
+<pre><code>workaround_type_encrypted_passphrase();</code></pre>
 
 <p>Record soft-failure for unresolved feature fsc#320901 which we think is important and then unlock encrypted boot partitions if we expect it to be encrypted. This condition is met on &#39;storage-ng&#39; which by default puts the boot partition within the encrypted LVM same as in test scenarios where we explicitly create an LVM including boot (<code>FULL_LVM_ENCRYPT</code>). <code>ppc64le</code> was already doing the same by default also in the case of pre-storage-ng but not anymore for storage-ng.</p>
 
 <h2 id="is_boot_encrypted">is_boot_encrypted</h2>
 
-<pre><code> is_boot_encrypted();</code></pre>
+<pre><code>is_boot_encrypted();</code></pre>
 
 <p>This will return <code>1</code> if the env variables suggest that the boot partition is encrypted.</p>
 
 <h2 id="is_bridged_networking">is_bridged_networking</h2>
 
-<pre><code> is_bridged_networking();</code></pre>
+<pre><code>is_bridged_networking();</code></pre>
 
 <p>returns <code>BRIDGED_NETWORKING</code>.</p>
 
 <h2 id="set_bridged_networking">set_bridged_networking</h2>
 
-<pre><code> set_bridged_networking();</code></pre>
+<pre><code>set_bridged_networking();</code></pre>
 
 <p>Sets <code>BRIDGED_NETWORKING</code> to <code>1</code> if applicable.</p>
 
+<h2 id="print_ip_info">print_ip_info</h2>
+
+<pre><code>print_ip_info();</code></pre>
+
+<p>Print the interface addresses, routes and adjacent network nodes (that have been seen). Especially useful for multi-machine test debugging.</p>
+
 <h2 id="set_hostname">set_hostname</h2>
 
-<pre><code> set_hostname($hostname);</code></pre>
+<pre><code>set_hostname($hostname);</code></pre>
 
 <p>Setting hostname according input parameter using hostnamectl. Calling <i>reload-or-restart</i> to make sure that network stack will propogate hostname into DHCP/DNS.</p>
 
@@ -327,7 +365,7 @@
 
 <h2 id="assert_and_click_until_screen_change">assert_and_click_until_screen_change</h2>
 
-<pre><code> assert_and_click_until_screen_change($mustmatch [, $wait_change [, $repeat ]]);</code></pre>
+<pre><code>assert_and_click_until_screen_change($mustmatch [, $wait_change [, $repeat ]]);</code></pre>
 
 <p>This will repeat <code>assert_and_click($mustmatch)</code> up to <code>$repeat</code> times, trying againg if the screen has not changed within <code>$wait_change</code> seconds after the <code>assert_and_click</code>. Returns the number of attempts made. <code>$wait_change</code> defaults to 2 (seconds) and <code>$repeat</code> defaults to 3.</p>
 
@@ -335,13 +373,13 @@
 
 <h2 id="handle_livecd_reboot_failure">handle_livecd_reboot_failure</h2>
 
-<pre><code> handle_livecd_reboot_failure();</code></pre>
+<pre><code>handle_livecd_reboot_failure();</code></pre>
 
 <p>Handle a potential failure on a live CD related to boo#993885 that the reboot action from a desktop session does not work and we are stuck on the desktop.</p>
 
 <h2 id="assert_screen_with_soft_timeout">assert_screen_with_soft_timeout</h2>
 
-<pre><code> assert_screen_with_soft_timeout($mustmatch, bugref =&gt; $bugref [,timeout =&gt; $timeout] [,soft_timeout =&gt; $soft_timeout] [,soft_failure_reason =&gt; $soft_failure_reason]);</code></pre>
+<pre><code>assert_screen_with_soft_timeout($mustmatch, bugref =&gt; $bugref [,timeout =&gt; $timeout] [,soft_timeout =&gt; $soft_timeout] [,soft_failure_reason =&gt; $soft_failure_reason]);</code></pre>
 
 <p>Extending assert_screen with a soft timeout. When <code>$soft_timeout</code> is hit, a soft failure is recorded with the message <code>$soft_failure_reason</code> but <code>assert_screen</code> continues until the (hard) timeout <code>$timeout</code> is hit. This makes sense when an assert screen should find a screen within a lower time but still should not fail and continue until the hard timeout, e.g. to discover performance issues.</p>
 
@@ -349,93 +387,93 @@
 
 <p>Example:</p>
 
-<pre><code> assert_screen_with_soft_timeout(&#39;registration-found&#39;, timeout =&gt; 300, soft_timeout =&gt; 60, bugref =&gt; &#39;bsc#123456&#39;);</code></pre>
+<pre><code>assert_screen_with_soft_timeout(&#39;registration-found&#39;, timeout =&gt; 300, soft_timeout =&gt; 60, bugref =&gt; &#39;bsc#123456&#39;);</code></pre>
 
 <h2 id="quit_packagekit">quit_packagekit</h2>
 
-<pre><code> quit_packagekit();</code></pre>
+<pre><code>quit_packagekit();</code></pre>
 
 <p>Stop and mask packagekit service and wait until it is really dead. This is needed to prevent access conflicts to the RPM database.</p>
 
 <h2 id="wait_for_purge_kernels">wait_for_purge_kernels</h2>
 
-<pre><code> wait_for_purge_kernels();</code></pre>
+<pre><code>wait_for_purge_kernels();</code></pre>
 
 <p>Wait until purge-kernels is done Prevent RPM lock e.g. SUSEConnect fail</p>
 
 <h2 id="addon_decline_license">addon_decline_license</h2>
 
-<pre><code> addon_decline_license();</code></pre>
+<pre><code>addon_decline_license();</code></pre>
 
 <p>TODO someone should document this</p>
 
 <h2 id="addon_license">addon_license</h2>
 
-<pre><code> addon_license($addon);</code></pre>
+<pre><code>addon_license($addon);</code></pre>
 
 <p>TODO someone should document this</p>
 
 <h2 id="addon_products_is_applicable">addon_products_is_applicable</h2>
 
-<pre><code> addon_products_is_applicable();</code></pre>
+<pre><code>addon_products_is_applicable();</code></pre>
 
 <p>Return <code>1</code> if <code>ADDONURL</code> is set and <code>LIVECD</code> is unset.</p>
 
 <h2 id="noupdatestep_is_applicable">noupdatestep_is_applicable</h2>
 
-<pre><code> noupdatestep_is_applicable();</code></pre>
+<pre><code>noupdatestep_is_applicable();</code></pre>
 
 <p>Return <code>1</code> if neither <code>UPGRADE</code> nor <code>LIVE_UPGRADE</code> is set.</p>
 
 <h2 id="installwithaddonrepos_is_applicable">installwithaddonrepos_is_applicable</h2>
 
-<pre><code> installwithaddonrepos_is_applicable();</code></pre>
+<pre><code>installwithaddonrepos_is_applicable();</code></pre>
 
 <p>Return <code>1</code> if installation should be done with addon repos based on ENV variables.</p>
 
 <h2 id="random_string">random_string</h2>
 
-<pre><code> random_string($length);</code></pre>
+<pre><code>random_string($length);</code></pre>
 
 <p>Returns a random string with length <code>$length</code> (default: 4) containing alphanumerical characters.</p>
 
 <h2 id="handle_emergency">handle_emergency</h2>
 
-<pre><code> handle_emergency();</code></pre>
+<pre><code>handle_emergency();</code></pre>
 
 <p>Handle emergency shell or (systemd) emergency mode and dump some basic logging information to the serial output.</p>
 
 <h2 id="service_action">service_action</h2>
 
-<pre><code> service_action($service_name [, {type =&gt; [&#39;$unit_type&#39;, ...] [,action =&gt; [&#39;$service_action&#39;, ...]]}]);</code></pre>
+<pre><code>service_action($service_name [, {type =&gt; [&#39;$unit_type&#39;, ...] [,action =&gt; [&#39;$service_action&#39;, ...]]}]);</code></pre>
 
 <p>Control systemd services. <code>type</code> may be set to service, socket, ... and <code>$action</code> to start, stop, ... Default action is to &#39;stop&#39; $service_name.service unit file.</p>
 
 <p>Example:</p>
 
-<pre><code> service_action(&#39;dbus&#39;, {type =&gt; [&#39;socket&#39;, &#39;service&#39;], action =&gt; [&#39;unmask&#39;, &#39;start&#39;]});</code></pre>
+<pre><code>service_action(&#39;dbus&#39;, {type =&gt; [&#39;socket&#39;, &#39;service&#39;], action =&gt; [&#39;unmask&#39;, &#39;start&#39;]});</code></pre>
 
 <h2 id="get_root_console_tty">get_root_console_tty</h2>
 
-<pre><code> get_root_console_tty();</code></pre>
+<pre><code>get_root_console_tty();</code></pre>
 
 <p>Returns tty number used designed to be used for root-console. When console is not yet initialized, we cannot get it from arguments. Since SLE 15 gdm is running on tty2, so we change behaviour for it and openSUSE distris, except for Xen PV (bsc#1086243).</p>
 
 <h2 id="get_x11_console_tty">get_x11_console_tty</h2>
 
-<pre><code> get_x11_console_tty();</code></pre>
+<pre><code>get_x11_console_tty();</code></pre>
 
-<p>Returns tty number used designed to be used for X. Since SLE 15 gdm is always running on tty7, currently the main GUI session is running on tty2 by default, except for Xen PV and Hyper-V (bsc#1086243). See also: bsc#1054782</p>
+<p>Returns tty number used designed to be used for X. Since SLE 15 gdm is always running on tty7, currently the main GUI session is running on tty2 by default, except for Xen PV and Hyper-V (bsc#1086243). See also: bsc#1054782 SDDM 0.20 uses the first free VT (usually tty2) for the greeter as well as the session.</p>
 
 <h2 id="arrays_differ">arrays_differ</h2>
 
-<pre><code> arrays_differ(\@array1, \@array2);</code></pre>
+<pre><code>arrays_differ(\@array1, \@array2);</code></pre>
 
 <p>Comparing two arrays passed by reference. Return 1 if arrays has symmetric difference and 0 otherwise.</p>
 
 <h2 id="arrays_subset">arrays_subset</h2>
 
-<pre><code> arrays_subset(\@array1, \@array2);</code></pre>
+<pre><code>arrays_subset(\@array1, \@array2);</code></pre>
 
 <p>Compares two arrays passed by reference to identify if array1 is a subset of array2.</p>
 
@@ -443,19 +481,19 @@
 
 <h2 id="ensure_serialdev_permissions">ensure_serialdev_permissions</h2>
 
-<pre><code> ensure_serialdev_permissions();</code></pre>
+<pre><code>ensure_serialdev_permissions();</code></pre>
 
 <p>Grant user permission to access serial port immediately as well as persisting over reboots. Used to ensure that testapi calls like script_run work for the test user as well as root.</p>
 
 <h2 id="disable_serial_getty">disable_serial_getty</h2>
 
-<pre><code> disable_serial_getty();</code></pre>
+<pre><code>disable_serial_getty();</code></pre>
 
 <p>Serial getty service pollutes serial output with login prompt, which interferes with the output, e.g. when calling <code>script_output</code>. Login prompt messages on serial are used on some remote backend to identify that system has been booted, so do not mask on non-qemu backends. This is only necessary for Linux &lt; 4.20.4 so skipped on more recent versions.</p>
 
 <h2 id="exec_and_insert_password">exec_and_insert_password</h2>
 
-<pre><code> exec_and_insert_password($cmd);</code></pre>
+<pre><code>exec_and_insert_password($cmd);</code></pre>
 
 <p>1. Execute a command (<code>$cmd</code>) that ask for a password</p>
 
@@ -465,7 +503,7 @@
 
 <h2 id="shorten_url">shorten_url</h2>
 
-<pre><code> shorten_url($url, [wishid =&gt; $wishid]);</code></pre>
+<pre><code>shorten_url($url, [wishid =&gt; $wishid]);</code></pre>
 
 <p>Shorten url via schort(s.qa.suse.de) This is mainly used for autoyast url shorten to avoid limit of x3270 xedit.</p>
 
@@ -473,25 +511,25 @@
 
 <h2 id="handle_login_not_found">_handle_login_not_found</h2>
 
-<pre><code> _handle_login_not_found($str);</code></pre>
+<pre><code>_handle_login_not_found($str);</code></pre>
 
 <p>Internal helper function used by <code>reconnect_mgmt_console</code>.</p>
 
 <h2 id="handle_firewall">_handle_firewall</h2>
 
-<pre><code> _handle_firewall();</code></pre>
+<pre><code>_handle_firewall();</code></pre>
 
 <p>Internal helper function used by <code>reconnect_mgmt_console</code>.</p>
 
 <h2 id="reconnect_mgmt_console">reconnect_mgmt_console</h2>
 
-<pre><code> reconnect_mgmt_console([timeout =&gt; $timeout]);</code></pre>
+<pre><code>reconnect_mgmt_console([timeout =&gt; $timeout]);</code></pre>
 
 <p>After each reboot we have to reconnect to the management console on remote backends. <code>$timeout</code> can be set to some specific time and if during reboot GRUB is shown twice <code>grub_expected_twice</code> can be set to 1.</p>
 
 <h2 id="show_tasks_in_blocked_state">show_tasks_in_blocked_state</h2>
 
-<pre><code> show_tasks_in_blocked_state();</code></pre>
+<pre><code>show_tasks_in_blocked_state();</code></pre>
 
 <p>Dumps tasks that are in uninterruptable (blocked) state and wait for headline of dump.</p>
 
@@ -499,19 +537,19 @@
 
 <h2 id="show_oom_info">show_oom_info</h2>
 
-<pre><code> show_oom_info</code></pre>
+<pre><code>show_oom_info</code></pre>
 
 <p>Show logs about an out of memory process kill.</p>
 
 <h2 id="svirt_host_basedir">svirt_host_basedir</h2>
 
-<pre><code> svirt_host_basedir();</code></pre>
+<pre><code>svirt_host_basedir();</code></pre>
 
 <p>Return <code>VIRSH_OPENQA_BASEDIR</code> or fall back to <code>/var/lib</code>.</p>
 
 <h2 id="script_retry">script_retry</h2>
 
-<pre><code> script_retry($cmd, [expect =&gt; $expect], [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout], [die =&gt; $die]);</code></pre>
+<pre><code>script_retry($cmd, [expect =&gt; $expect], [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout], [die =&gt; $die]);</code></pre>
 
 <p>Repeat command until expected result or timeout.</p>
 
@@ -521,17 +559,19 @@
 
 <p><code>$delay</code> is the time between retries and defaults to <code>30</code>.</p>
 
+<p><code>$fail_message</code> is an optional error message in case of failure. Defaults to &quot;Waiting for Godot&quot;.</p>
+
 <p>The command must return within <code>$timeout</code> seconds (default: 25).</p>
 
 <p>If the command doesn&#39;t return <code>$expect</code> after <code>$retry</code> retries, this function will die, if <code>$die</code> is set.</p>
 
 <p>Example:</p>
 
-<pre><code> script_retry(&#39;ping -c1 -W1 machine&#39;, retry =&gt; 5);</code></pre>
+<pre><code>script_retry(&#39;ping -c1 -W1 machine&#39;, retry =&gt; 5);</code></pre>
 
 <h2 id="script_output_retry">script_output_retry</h2>
 
-<pre><code> script_output_retry($cmd, [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout], [die =&gt; $die]);</code></pre>
+<pre><code>script_output_retry($cmd, [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout], [die =&gt; $die]);</code></pre>
 
 <p>Repeat command until expected result or timeout. Return the output of the command on success.</p>
 
@@ -541,17 +581,19 @@
 
 <p><code>$delay</code> is the time between retries and defaults to <code>30</code>.</p>
 
+<p><code>$fail_message</code> is an optional error message in case of failure. Defaults to &quot;Waiting for Godot&quot;.</p>
+
 <p>The command must return within <code>$timeout</code> seconds (default: 25).</p>
 
 <p>If the command doesn&#39;t return <code>$expect</code> after <code>$retry</code> retries, this function will die, if <code>$die</code> is set.</p>
 
 <p>Example:</p>
 
-<pre><code> script_output_retry(&#39;ping -c1 -W1 machine&#39;, retry =&gt; 5);</code></pre>
+<pre><code>script_output_retry(&#39;ping -c1 -W1 machine&#39;, retry =&gt; 5);</code></pre>
 
 <h2 id="validate_script_output_retry">validate_script_output_retry</h2>
 
-<pre><code> validate_script_output_retry($cmd, $check, [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout]);</code></pre>
+<pre><code>validate_script_output_retry($cmd, $check, [retry =&gt; $retry], [delay =&gt; $delay], [timeout =&gt; $timeout]);</code></pre>
 
 <p>Repeat command until validate_script_output succeeds or die. Return the output of the command on success.</p>
 
@@ -559,26 +601,28 @@
 
 <p><code>$delay</code> is the time between retries and defaults to <code>30</code>.</p>
 
+<p><code>$fail_message</code> is an optional error message in case of failure. Defaults to &quot;Can&#39;t validate output after $retry retries&quot;.</p>
+
 <p>If the command doesn&#39;t succeed after <code>$retry</code> retries, this function will die.</p>
 
 <p>Example:</p>
 
-<pre><code> validate_script_output_retry(&#39;ping -c1 -W1 machine&#39;, m/1 packets transmitted/, retry =&gt; 5, delay =&gt; 60);</code></pre>
+<pre><code>validate_script_output_retry(&#39;ping -c1 -W1 machine&#39;, m/1 packets transmitted/, retry =&gt; 5, delay =&gt; 60);</code></pre>
 
 <h2 id="script_run_interactive">script_run_interactive</h2>
 
-<pre><code> script_run_interactive($cmd, $prompt, $timeout);</code></pre>
+<pre><code>script_run_interactive($cmd, $prompt, $timeout);</code></pre>
 
 <p>For interactive command, input strings or keys according to the prompt message in the run time. Pass arrayref <code>$prompt</code> which contains the prompt message to be matched (regex) and the answer with string or key to be typed. for example:</p>
 
-<pre><code>    [{
-        prompt =&gt; qr/\(A\)llow/m,
-        key    =&gt; &#39;a&#39;,
-      },
-      {
-        prompt =&gt; qr/Enter Password or Pin/m,
-        string =&gt; &quot;testpasspw\n&quot;,
-      },]</code></pre>
+<pre><code>[{
+    prompt =&gt; qr/\(A\)llow/m,
+    key    =&gt; &#39;a&#39;,
+  },
+  {
+    prompt =&gt; qr/Enter Password or Pin/m,
+    string =&gt; &quot;testpasspw\n&quot;,
+  },]</code></pre>
 
 <p>A &quot;EOS~~~&quot; message followed by return value will be printed as a mark for the end of interaction after the command finished running.</p>
 
@@ -586,13 +630,13 @@
 
 <h2 id="create_btrfs_subvolume">create_btrfs_subvolume</h2>
 
-<pre><code> create_btrfs_subvolume();</code></pre>
+<pre><code>create_btrfs_subvolume();</code></pre>
 
 <p>Create btrfs subvolume for <code>/boot/grub2/arm64-efi</code> before migration. ref:bsc#1122591</p>
 
 <h2 id="create_raid_loop_device">create_raid_loop_device</h2>
 
-<pre><code> create_raid_loop_device([raid_type =&gt; $raid_type], [device_num =&gt; $device_num], [file_size =&gt; $file_size]);</code></pre>
+<pre><code>create_raid_loop_device([raid_type =&gt; $raid_type], [device_num =&gt; $device_num], [file_size =&gt; $file_size]);</code></pre>
 
 <p>Create a raid array over loop devices. Raid type is <code>$raid_type</code>, using <code>$device_num</code> number of loop device, with the size of each device being <code>$file_size</code> megabytes.</p>
 
@@ -600,10 +644,10 @@
 
 <h2 id="file_content_replace">file_content_replace</h2>
 
-<pre><code> file_content_replace(&quot;filename&quot;,
-       regex_to_find =&gt; text_to_replace,
-       &#39;--sed-modifier&#39; =&gt; &#39;g&#39;,
-       &#39;another^&amp;&amp;*(textToFind&#39; =&gt; &quot;replacement&quot;)</code></pre>
+<pre><code>file_content_replace(&quot;filename&quot;,
+      regex_to_find =&gt; text_to_replace,
+      &#39;--sed-modifier&#39; =&gt; &#39;g&#39;,
+      &#39;another^&amp;&amp;*(textToFind&#39; =&gt; &quot;replacement&quot;)</code></pre>
 
 <p>Generify sed usage as config file modification tool. allow to modify several items in one function call by providing <code>regex_to_find</code> / <code>text_to_replace</code> as hash key/value pairs</p>
 
@@ -640,6 +684,70 @@
 <p>This function is used for checking if the package is upgraded to the required version</p>
 
 <p>Sample config of parameter of the function below: my $pkg_list = {ibmtss =&gt; &#39;1.6.0&#39;}; here, &#39;libmtss&#39; is the package name, and &#39;1.6.0&#39; is target version which needs to be upgrated to</p>
+
+<h2 id="validate_result-_validate_result">_validate_result _validate_result();</h2>
+
+<p>This is a private method which is used by <code>generate_results</code> to convert the results in a string representation. At the moment the status that are supported are {PASS,FAIL}.</p>
+
+<p>The method takes as the only argument the return of a perl statement or subroutine.</p>
+
+<h2 id="generate_results-generate_results">generate_results generate_results();</h2>
+
+<p>This function is used to construct a hash suitable for representation in junit xml format.</p>
+
+<h2 id="pars_results-pars_results">pars_results pars_results();</h2>
+
+<p>Takes <code>test</code> as an argument. <code>test</code> is an array of hashes which contain the test results. They usually are generated by <code>generate_results</code>. Those are parsed and create the junit xml representation.</p>
+
+<h2 id="test_case-test_case-name-description-result">test_case test_case($name, $description, $result);</h2>
+
+<p><code>test_case</code> can produce a data_structure which <code>pars_results</code> can utilize. Using <code>test_case</code> in an OpenQA module you are able to /name/ and describe the whole test as subtasks, in a XUnit format.</p>
+
+<h2 id="remount_tmp_if_ro">remount_tmp_if_ro</h2>
+
+<pre><code>remount_tmp_if_ro();</code></pre>
+
+<p>Mounts /tmp to shared memory if not possible to write to tmp. For example, save_y2logs creates temporary files there.</p>
+
+<h2 id="detect_bsc_1063638">detect_bsc_1063638</h2>
+
+<pre><code>detect_bsc_1063638();</code></pre>
+
+<p>Btrfs maintenance jobs lead to the system being unresponsive and affects SUT&#39;s performance. Not to waste time during investigation of the failures, we would like to detect if such jobs are running, providing a hint why test timed out. This method will create a softfail if such a problem is detected.</p>
+
+<h2 id="script_start_io">script_start_io</h2>
+
+<pre><code>script_start_io($cmd [, %args]);</code></pre>
+
+<p>Start program <code>$cmd</code> in console for interactive input and output. Call <code>script_finish_io()</code> after sending the appropriate exit command to the program. Example usage:</p>
+
+<pre><code>script_start_io(&#39;python3&#39;);
+enter_cmd(&#39;int(&quot;123&quot;)&#39;);
+wait_serial(qr/^123/m) or die &#39;Wrong output&#39;;
+enter_cmd(&#39;int(&quot;123&quot;, 16)&#39;);
+wait_serial(qr/^291/m) or die &#39;Wrong output&#39;;
+enter_cmd(&#39;exit(12)&#39;);
+script_finish_io(exitcode =&gt; [12]);</code></pre>
+
+<p>Set <code>$quiet</code> to avoid recording serial result for the initial command.</p>
+
+<h2 id="script_finish_io">script_finish_io</h2>
+
+<pre><code>script_finish_io([timeout =&gt; $timeout] [, exitcode =&gt; undef]);</code></pre>
+
+<p>Finish interactive session started by <code>script_start_io()</code> and return command exit code. If <code>$exitcodes</code> is set, the command exit code must match one of the values in the given array, otherwise the current test will fail. <code>$timeout</code> controls how long to wait for the interactive command to exit. See <code>script_start_io()</code> for example usage.</p>
+
+<h2 id="handle_screen-handle_screen-needles-handler_map-assert-assert-max_loops-max_loops">handle_screen handle_screen($needles, $handler_map [, assert =&gt; $assert] [, max_loops =&gt; $max_loops] [...]);</h2>
+
+<p>Wait for <code>$needles</code> to appear on screen and then execute the appropriate handler function from <code>$handler_map</code> hash. <code>$needles</code> can be any value accepted by <code>assert_screen()</code> or <code>check_screen()</code>. <code>$assert</code> controls whether failed needle match should trigger test failure (when true, default) or just silently return (when false). <code>$max_loops</code> limits how many needle checks and handler calls can be done (default: count of <code>$needles</code>). Negative <code>$max_loops</code> means unlimited loop count. Any additional keyword arguments will be passed to <code>assert_screen()</code> or <code>check_screen()</code>.</p>
+
+<p><code>$handler_map</code> is a hashref in the format <code>{&quot;needle-tag&quot; =&gt; $handler}</code>. After a successful needle match, all needle tags in <code>$handler_map</code> will be checked and the matching needle must have exactly one of them. It is an error if the needle does not have exactly one handler in <code>$handler_map</code>.</p>
+
+<p><code>handle_screen()</code> will return after <code>$max_loops</code> iterations, or if a handler function returns any value that evaluates to true, or if needle match fails when <code>$assert</code> is false. The return value is the last value returned by a handler function, or undefined if needle match failed.</p>
+
+<p>Note that you may need to set <code>timeout</code> keyword argument if you set <code>$assert</code> to false because <code>check_screen()</code> has <code>$timeout=0</code> by default.</p>
+
+<h2 id="define_secret_variable-define_secret_variable-var_name-var_value-define_secret_variable-sets-a-hidden-environment-variable-without-exposing-it-to-openQA.-This-function-is-useful-to-hide-secrets-from-openQA-by-setting-them-as-an-accessible-environment-variable-but-without-any-traces-in-the-output-terminals.-e.g.-define_secret_variable-SECRET-get_var-_SECRET_VARIABLE-would-store-the-openQA-variable-_SECRET_VARIABLE-into-the-SECRET-environment-variable-which-can-be-used-afterwards-by-using-SECRET">define_secret_variable define_secret_variable($var_name, $var_value); define_secret_variable sets a hidden environment variable without exposing it to openQA. This function is useful to hide secrets from openQA by setting them as an accessible environment variable, but without any traces in the output terminals. e.g. define_secret_variable(&#39;SECRET&#39;, get_var(&#39;_SECRET_VARIABLE&#39;)) would store the openQA variable &#39;_SECRET_VARIABLE&#39; into the &#39;$SECRET&#39; environment variable, which can be used afterwards by using $SECRET.</h2>
 
 
 </body>

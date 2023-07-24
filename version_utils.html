@@ -63,6 +63,7 @@
       <li><a href="#is_public_cloud">is_public_cloud</a></li>
       <li><a href="#is_openstack">is_openstack</a></li>
       <li><a href="#is_leap_migration">is_leap_migration</a></li>
+      <li><a href="#is_tunneled">is_tunneled</a></li>
       <li><a href="#has_test_issues">has_test_issues</a></li>
       <li><a href="#package_version_cmp">package_version_cmp</a></li>
       <li><a href="#is_quarterly_iso">is_quarterly_iso</a></li>
@@ -236,7 +237,7 @@
 
 <h2 id="has_product_selection">has_product_selection</h2>
 
-<pre><code>    has_product_selection;</code></pre>
+<pre><code>has_product_selection;</code></pre>
 
 <p>Identify cases when Installer has to show Product Selection screen.</p>
 
@@ -248,7 +249,7 @@
 
 <h2 id="has_license_on_welcome_screen">has_license_on_welcome_screen</h2>
 
-<pre><code>    has_license_on_welcome_screen;</code></pre>
+<pre><code>has_license_on_welcome_screen;</code></pre>
 
 <p>Identify cases when License Agreement has to be shown on Welcome screen and should be accepted there.</p>
 
@@ -312,6 +313,10 @@
 
 <p>Returns true if called in a leap to sle migration scenario</p>
 
+<h2 id="is_tunneled">is_tunneled</h2>
+
+<p>Returns true if TUNNELED is set to 1</p>
+
 <h2 id="has_test_issues">has_test_issues</h2>
 
 <p>Returns true if test issues are present (i.e. is update tests are present)</p>
@@ -326,9 +331,11 @@
 
 <h2 id="get_version_id">get_version_id</h2>
 
-<pre><code>  get_version_id(dst_machine =&gt; &#39;machine&#39;)</code></pre>
+<pre><code>get_version_id(dst_machine =&gt; &#39;machine&#39;)</code></pre>
 
-<p>Get SLES version from VERSION_ID in /etc/os-release. This subroutine also supports performing query on remote machine if dst_machine is given specific ip address or fqdn text of the remote machine. The default location that contains VERSION_ID is file /etc/os-release if nothing else is passed in to argument verid_file.</p>
+<p>Get SLES version from VERSION_ID in /etc/os-release. This subroutine also supports performing query on remote machine if dst_machine is given specific ip address or fqdn text of the remote machine. If <code>dst_machine</code> is given it will run on the remote as <b>root</b>. To run it as another user, <code>dst_machine</code> can be also specified as [user@]hostname.</p>
+
+<p>The default location that contains VERSION_ID is file /etc/os-release if nothing else is passed in to argument verid_file.</p>
 
 <h1 id="POD-ERRORS">POD ERRORS</h1>
 
@@ -336,13 +343,13 @@
 
 <dl>
 
-<dt id="Around-line-697">Around line 697:</dt>
+<dt id="Around-line-706">Around line 706:</dt>
 <dd>
 
 <p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
 
 </dd>
-<dt id="Around-line-728">Around line 728:</dt>
+<dt id="Around-line-737">Around line 737:</dt>
 <dd>
 
 <p>You forgot a &#39;=back&#39; before &#39;=head2&#39;</p>
