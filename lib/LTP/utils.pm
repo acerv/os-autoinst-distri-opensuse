@@ -14,9 +14,11 @@ use Utils::Backends;
 use autotest;
 use LTP::WhiteList;
 use LTP::TestInfo 'testinfo';
-use version_utils qw(is_jeos is_openstack is_rt);
+use version_utils qw(is_jeos is_rt is_sle is_leap is_tumbleweed is_transactional);
 use File::Basename 'basename';
 use Utils::Architectures;
+use utils;
+use repo_tools 'add_qa_head_repo';
 
 our @EXPORT = qw(
   get_ltproot
@@ -29,6 +31,7 @@ our @EXPORT = qw(
   schedule_tests
   shutdown_ltp
   want_ltp_32bit
+  add_ltp_repo
 );
 
 sub loadtest_kernel {
@@ -350,6 +353,34 @@ sub parse_runfiles {
                 $cmd_pattern, $cmd_exclude, $test_result_export, $suffix);
         }
     }
+}
+
+sub add_ltp_repo {
+    my $repo = get_var('LTP_REPOSITORY');
+
+    if (!$repo) {
+        if (is_sle || is_transactional) {
+            add_qa_head_repo;
+            return;
+        }
+
+        # ltp for leap15.2 is available only x86_64
+        if (is_leap('15.4+')) {
+            $repo = get_var('VERSION');
+        } elsif ((is_leap('=15.2') && is_x86_64) || is_leap('15.3+')) {
+            $repo = sprintf("openSUSE_Leap_%s", get_var('VERSION'));
+        } elsif (is_tumbleweed) {
+            $repo = "openSUSE_Factory";
+            $repo = "openSUSE_Factory_ARM" if (is_aarch64() || is_arm());
+            $repo = "openSUSE_Factory_PowerPC" if is_ppc64le();
+            $repo = "openSUSE_Factory_zSystems" if is_s390x();
+        } else {
+            die sprintf("Unexpected combination of version (%s) and architecture (%s) used", get_var('VERSION'), get_var('ARCH'));
+        }
+        $repo = "https://download.opensuse.org/repositories/benchmark:/ltp:/devel/$repo/";
+    }
+
+    zypper_ar($repo, name => 'ltp_repo');
 }
 
 1;
