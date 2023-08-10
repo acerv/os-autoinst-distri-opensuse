@@ -1,0 +1,8 @@
+name:          io_uring
+description:    >
+    Generic scheduler for Linux liburing
+schedule:
+    - boot/boot_to_desktop
+    - kernel/io_uring
+    - kernel/kirk
+    - shutdown/shutdown
