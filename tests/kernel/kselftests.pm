@@ -18,6 +18,15 @@ use LTP::WhiteList;
 use LTP::kirk;
 use LTP::utils;
 
+sub check_requirements
+{
+    my $suite = get_var('KSELFTESTS_SUITE', '');
+
+    if ($suite eq 'bpf') {
+        assert_script_run('insmod /usr/share/kselftests/bpf/bpf_testmod.ko');
+    }
+}
+
 sub run_tests
 {
     my ($root) = @_;
@@ -45,6 +54,8 @@ sub run_tests
     );
 
     my $suite = get_var('KSELFTESTS_SUITE', '');
+
+    check_requirements;
 
     LTP::kirk->run(
         framework => "kselftests:root=$root",
