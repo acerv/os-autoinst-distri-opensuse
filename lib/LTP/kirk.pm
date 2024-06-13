@@ -75,11 +75,42 @@ sub _kirk_from_container
 
 sub _kirk_upload_logs
 {
+    my ($self, $suite, $issues) = @_;
+    my $log_file = Mojo::File::path('ulogs/results.json');
+
+    assert_script_run("test -f /tmp/kirk.\$USER/latest/results.json || echo No results file");
+    upload_logs("/tmp/kirk.\$USER/latest/results.json", log_name => $log_file->basename, failok => 1);
+
     assert_script_run("test -f /tmp/kirk.\$USER/latest/debug.log || echo No debug log");
     upload_logs("/tmp/kirk.\$USER/latest/debug.log", failok => 1);
 
-    assert_script_run("test -f /tmp/kirk.\$USER/latest/results.json || echo No results file");
-    parse_extra_log('LTP', "/tmp/kirk.\$USER/latest/results.json");
+    return unless -e $log_file->to_string;
+
+    local @INC = ($ENV{OPENQA_LIBPATH} // testapi::OPENQA_LIBPATH, @INC);
+    eval {
+        require OpenQA::Parser::Format::LTP;
+
+        my $json_data = Mojo::JSON::decode_json($log_file->slurp());
+        my $parser = OpenQA::Parser::Format::LTP->new()->load($log_file->to_string);
+        my %results = map { $_->{test_fqn} => $_->{test} } @{$json_data->{results}};
+        my $whitelist = LTP::WhiteList->new($issues);
+        my $env = prepare_whitelist_environment();
+        $env->{kernel} = script_output('uname -r');
+
+        for my $result (@{$parser->results()}) {
+            if ($whitelist->override_known_failures($self, {%{$env}, retval => $results{$result->{test_fqn}}->{retval}}, $suite, $result->{test_fqn})) {
+                $result->{result} = 'softfail';
+            }
+        }
+
+        $parser->write_output(bmwqemu::result_dir());
+        $parser->write_test_result(bmwqemu::result_dir());
+
+        $parser->tests->each(sub {
+                $autotest::current_test->register_extra_test_results([$_->to_openqa]);
+        });
+    };
+    die $@ if $@;
 }
 
 sub run
@@ -114,7 +145,7 @@ sub run
         die("Installation can't be done via '$install_from'");
     }
 
-    _kirk_upload_logs;
+    _kirk_upload_logs($self, $args{suite}, $args{issues});
 }
 
 1;

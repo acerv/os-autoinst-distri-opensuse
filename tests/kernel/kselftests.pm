@@ -50,6 +50,7 @@ sub run_tests
         framework => "kselftests:root=$root",
         skip => $skip_tests,
         suite => $suite,
+        issues => $issues,
         # when KIRK_INSTALL == 'container' we want to share
         # kselftests folder and kirk logs folder
         container_volumes => \@volumes,
