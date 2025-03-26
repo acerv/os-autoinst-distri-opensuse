@@ -16,6 +16,8 @@
     <ul>
       <li><a href="#SAPINIT_RE-SYSTEMD_RE">SAPINIT_RE &amp; SYSTEMD_RE</a></li>
       <li><a href="#SYSTEMCTL_UNITS_RE">SYSTEMCTL_UNITS_RE</a></li>
+      <li><a href="#ASE_RESPONSE_FILE">ASE_RESPONSE_FILE</a></li>
+      <li><a href="#download_hana_assets_from_server">download_hana_assets_from_server</a></li>
       <li><a href="#ensure_serialdev_permissions_for_sap">ensure_serialdev_permissions_for_sap</a></li>
       <li><a href="#fix_path">fix_path</a></li>
       <li><a href="#set_ps_cmd">set_ps_cmd</a></li>
@@ -25,6 +27,8 @@
       <li><a href="#get_total_mem">get_total_mem</a></li>
       <li><a href="#is_saptune_installed">is_saptune_installed</a></li>
       <li><a href="#prepare_profile">prepare_profile</a></li>
+      <li><a href="#do_mount">_do_mount</a></li>
+      <li><a href="#copy_media">copy_media</a></li>
       <li><a href="#mount_media">mount_media</a></li>
       <li><a href="#add_hostname_to_hosts">add_hostname_to_hosts</a></li>
       <li><a href="#test_pids_max">test_pids_max</a></li>
@@ -45,6 +49,18 @@
       <li><a href="#upload_hana_install_log">upload_hana_install_log</a></li>
       <li><a href="#upload_nw_install_log">upload_nw_install_log</a></li>
       <li><a href="#startup_type">startup_type</a></li>
+      <li><a href="#prepare_swpm">prepare_swpm</a></li>
+      <li><a href="#prepare_sapinst_profile">prepare_sapinst_profile</a></li>
+      <li><a href="#prepare_sap_instances_data">prepare_sap_instances_data</a></li>
+      <li><a href="#get_nw_instance_name">get_nw_instance_name</a></li>
+      <li><a href="#is_instance_type_supported">is_instance_type_supported</a></li>
+      <li><a href="#share_hosts_entry">share_hosts_entry</a></li>
+      <li><a href="#add_hosts_file_entries">add_hosts_file_entries</a></li>
+      <li><a href="#get_sidadm">get_sidadm</a></li>
+      <li><a href="#get_instance_profile_path">get_instance_profile_path</a></li>
+      <li><a href="#load_ase_env">load_ase_env</a></li>
+      <li><a href="#upload_ase_logs">upload_ase_logs</a></li>
+      <li><a href="#modify_selinux_setenforce">modify_selinux_setenforce</a></li>
     </ul>
   </li>
 </ul><h1>lib/sles4sap.pm</h1>
@@ -70,6 +86,18 @@ $self-&gt;SYSTEMD_RE(qr/some regexp/);</code></pre>
 $self-&gt;SYSTEMCTL_UNITS_RE(qr/some regexp/);</code></pre>
 
 <p>Set or get a regular expression to test in the output of <code>systemctl --list-unit-files</code> whether the SAP workload was started via systemd units.</p>
+
+<h2 id="ASE_RESPONSE_FILE">ASE_RESPONSE_FILE</h2>
+
+<pre><code>$self-&gt;ASE_RESPONSE_FILE($filename);</code></pre>
+
+<p>Let the class methods know the name of the ASE response file currently in use. It is set to undef by default. Test modules testing for SAP ASE should set this property before anything else.</p>
+
+<h2 id="download_hana_assets_from_server">download_hana_assets_from_server</h2>
+
+<pre><code>$self-&gt;download_hana_assets_from_server()</code></pre>
+
+<p>Download and extract HANA installation media to /sapinst directory of the SUT. The media location must be provided as ASSET_0 in the job settings and be available as an uncompressed tar in the factory/other directory of the openQA server</p>
 
 <h2 id="ensure_serialdev_permissions_for_sap">ensure_serialdev_permissions_for_sap</h2>
 
@@ -125,6 +153,22 @@ $self-&gt;SYSTEMCTL_UNITS_RE(qr/some regexp/);</code></pre>
 
 <p>Configures with <b>saptune</b> (if available in SUT) or <b>sapconf</b> the SUT according to a profile passed as argument. <b>$profile</b> must be either <b>HANA</b> or <b>NETWEAVER</b>. Croaks on failure.</p>
 
+<h2 id="do_mount">_do_mount</h2>
+
+<pre><code>_do_mount( $proto, $path, $target);</code></pre>
+
+<p>Performs a call to the mount command (used by both <code>mount_media</code> and <code>copy_media</code>) with appropriate options depending on the protocol. Function internal to the class.</p>
+
+<h2 id="copy_media">copy_media</h2>
+
+<pre><code>$self-&gt;copy_media( $proto, $path, $timeout, $target);</code></pre>
+
+<p>Copies installation media in SUT from the share identified by <b>$proto</b> and <b>$path</b> into the target directory <b>$target</b>. <b>$timeout</b> specifies how long to wait for the copy to complete.</p>
+
+<p>After installation files are copied, this method will also verify the existence of a <i>checksum.md5sum</i> file in the target directory and use it to check for the integrity of the copied files. This test can be skipped by setting to a true value the <b>DISABLE_CHECKSUM</b> setting in the test.</p>
+
+<p>The method will croak if any of the commands sent to SUT fail.</p>
+
 <h2 id="mount_media">mount_media</h2>
 
 <pre><code>$self-&gt;mount_media( $proto, $path, $target );</code></pre>
@@ -165,7 +209,7 @@ $self-&gt;SYSTEMCTL_UNITS_RE(qr/some regexp/);</code></pre>
 
 <pre><code>$self-&gt;test_stop();</code></pre>
 
-<p>Tests with <b>sapcontrol</b> and functions <b>Stop</b> and <b>StopService</b> that the instance and services are succesfully stopped. Croaks on failure.</p>
+<p>Tests with <b>sapcontrol</b> and functions <b>Stop</b> and <b>StopService</b> that the instance and services are successfully stopped. Croaks on failure.</p>
 
 <h2 id="test_start">test_start</h2>
 
@@ -258,6 +302,132 @@ $self-&gt;SYSTEMCTL_UNITS_RE(qr/some regexp/);</code></pre>
 <pre><code>$self-&gt;startup_type();</code></pre>
 
 <p>Record whether the SAP workload was started via sapinit or systemd units.</p>
+
+<h2 id="prepare_swpm">prepare_swpm</h2>
+
+<pre><code>$self-&gt;prepare_swpm(sapcar_bin_path=&gt;$sapcar_bin_path,
+   sar_archives_dir=&gt;$sar_archives_dir,
+   swpm_sar_filename=&gt;$swpm_sar_filename,
+   target_path=&gt;$target_path);</code></pre>
+
+<p>Unpacks and prepares swpm package from specified source dir into target directory using SAPCAR tool. After extraction it checks for &#39;sapinst&#39; executable being present in target path. Croaks if executable is missing.</p>
+
+<p><b>sapcar_bin_path</b> Filename with full path to SAPCAR binary</p>
+
+<p><b>sar_archives_dir</b> Directory which contains all required SAR archives (SWPM, SAP kernel, Patches, etc...)</p>
+
+<p><b>swpm_sar_filename</b> SWPM SAR archive filename</p>
+
+<p><b>target_path</b> Target path for archives to be unpacked into</p>
+
+<h2 id="prepare_sapinst_profile">prepare_sapinst_profile</h2>
+
+<pre><code>$self-&gt;prepare_sapinst_profile(
+   profile_target_file=&gt;$profile_target_file,
+   profile_template_file=&gt;$profile_template_file,
+   sar_location_directory=&gt;$sar_location_directory);</code></pre>
+
+<p>Copies sapinst profile template from NFS to target dir and fills in required variables.</p>
+
+<p><b>profile_target_file</b> Full filename and path for sapinst install profile to be created</p>
+
+<p><b>profile_template_file</b> Template file location from which will the profile be created</p>
+
+<p><b>sar_location_directory</b> Location of SAR files - this is filled into template</p>
+
+<h2 id="prepare_sap_instances_data">prepare_sap_instances_data</h2>
+
+<pre><code>$self-&gt;prepare_sap_instances_data();</code></pre>
+
+<p>Prepares data for installation of all SAP components using openqa parameter &quot;SAP_INSTANCES&quot;. parameter example: SAP_INSTANCES = &quot;ASCS,ERS,PAS,AAS&quot;.</p>
+
+<p><b>HDB</b> = Hana database export - netweaver component, not database</p>
+
+<p><b>ASCS</b> = Central services</p>
+
+<p><b>ERS</b> = Enqueue replication</p>
+
+<p><b>PAS</b> = Primary application server</p>
+
+<p><b>AAS</b> = Additional application server</p>
+
+<h2 id="get_nw_instance_name">get_nw_instance_name</h2>
+
+<pre><code>$self-&gt;get_nw_instance_name(instance_type=&gt;$instance_type, instance_id=&gt;$instance_id);</code></pre>
+
+<p>Returns standard sap instance directory name constructed from instance id and instance type.</p>
+
+<p><b>instance_type</b> Instance type (ASCS, ERS, PAS, AAS)</p>
+
+<p><b>instance_id</b> Instance ID - two digit number</p>
+
+<h2 id="is_instance_type_supported">is_instance_type_supported</h2>
+
+<pre><code>$self-&gt;is_instance_type_supported($instance_type);</code></pre>
+
+<p>Checks if instance type is supported. Returns $instance_type with success, croaks with missing argument or unsupported value detected.</p>
+
+<p><b>instance_type</b> Instance type (ASCS, ERS, PAS, AAS)</p>
+
+<h2 id="share_hosts_entry">share_hosts_entry</h2>
+
+<pre><code>$self-&gt;share_hosts_entry(virtual_hostname=&gt;$virtual_hostname,
+                         virtual_ip=&gt;$virtual_ip,
+                         shared_directory_root=&gt;shared_directory_root);</code></pre>
+
+<p>Creates file with virtual IP and hostname entry for <code>/etc/hosts</code> file on mounted shared device (Default: <code>/sapmnt</code>). This is to help creating <code>/etc/hosts</code> file which would include entries for all nodes.</p>
+
+<p>File name: &lt;INSTANCE_TYPE&gt;</p>
+
+<p>File content: &lt;virtual IP&gt; &lt;virtual_hostname&gt;</p>
+
+<p><b>virtual_hostname</b> Virtual hostname (alias) which is tied to instance and will be moved with HA IP addr resource</p>
+
+<p><b>virtual_ip</b> Virtual IP addr tied to an instance and HA resource</p>
+
+<p><b>shared_directory_root</b> Shared directory available for all instances. Separate directory &#39;hosts&#39; will be created</p>
+
+<h2 id="add_hosts_file_entries">add_hosts_file_entries</h2>
+
+<pre><code>$self-&gt;add_hosts_file_entries();</code></pre>
+
+<p>Reads files in &#39;HOSTS_SHARED_DIRECTORY&#39; and adds entries into /etc/hosts file.</p>
+
+<h2 id="get_sidadm">get_sidadm</h2>
+
+<pre><code>$self-&gt;get_sidadm([must_exist=&gt;$must_exist]);</code></pre>
+
+<p>Returns sidadm username created from SAP sid - parameter INSTANCE_SID. check_if_exists - if set to true, test will fail if user does not exist. tests inconsistency between OpenQA parameter and real username</p>
+
+<p><b>must_exist</b> Checks if sidadm exists, croaks on failure. Default &#39;false&#39;</p>
+
+<h2 id="get_instance_profile_path">get_instance_profile_path</h2>
+
+<pre><code>$self-&gt;get_instance_profile_path(instance_type=&gt;$instance_type, instance_id=$instance_id);</code></pre>
+
+<p>Returns full instance profile path for specified instance type</p>
+
+<p><b>instance_type</b> Instance type (ASCS, ERS, PAS, AAS)</p>
+
+<p><b>instance_id</b> Instance number - two digit number</p>
+
+<h2 id="load_ase_env">load_ase_env</h2>
+
+<pre><code>$self-&gt;load_ase_env</code></pre>
+
+<p>Loads environment variables from ASE installation into the current shell session.</p>
+
+<h2 id="upload_ase_logs">upload_ase_logs</h2>
+
+<pre><code>$self-&gt;upload_ase_logs</code></pre>
+
+<p>Save and upload to openQA the SAP ASE installation logs. These are typically located in <code>/opt/sap/log</code> and <code>/opt/sap/$SYBASE_ASE/install</code> but depend on the response file used during installation.</p>
+
+<h2 id="modify_selinux_setenforce">modify_selinux_setenforce</h2>
+
+<pre><code>$self-&gt;modify_selinux_setenforce</code></pre>
+
+<p>Modify SELinux mode to Enforcing or Permissive.</p>
 
 
 </body>

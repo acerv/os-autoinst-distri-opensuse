@@ -14,16 +14,37 @@
 <ul id="index"><li><a href="../index.html"><i>&lt;= Back to file list</i></a></li>
   <li>
     <ul>
+      <li><a href="#ssh_add_suseconnect_product">ssh_add_suseconnect_product</a></li>
+      <li><a href="#ssh_remove_suseconnect_product">ssh_remove_suseconnect_product</a></li>
       <li><a href="#gcloud_install-gcloud_install-url-dir-timeout">gcloud_install gcloud_install($url, $dir, $timeout)</a></li>
+      <li><a href="#ssh_update_transactional_system">ssh_update_transactional_system</a></li>
     </ul>
   </li>
 </ul><h1>lib/publiccloud/utils.pm</h1>
+
+<h2 id="ssh_add_suseconnect_product">ssh_add_suseconnect_product</h2>
+
+<pre><code>ssh_add_suseconnect_product($remote, $name, [program =&gt; $program, [version =&gt; $version, [arch =&gt; $arch, [params =&gt; $params, [timeout =&gt; $timeout, [retries =&gt; $retries, [delay =&gt; $delay]]]]]]]);</code></pre>
+
+<p>Register addon in the SUT</p>
+
+<h2 id="ssh_remove_suseconnect_product">ssh_remove_suseconnect_product</h2>
+
+<pre><code>ssh_remove_suseconnect_product($name, [$version, [$arch, [$params]]]);</code></pre>
+
+<p>Deregister addon in SUT</p>
 
 <h2 id="gcloud_install-gcloud_install-url-dir-timeout">gcloud_install gcloud_install($url, $dir, $timeout)</h2>
 
 <p>This function is used to install the gcloud CLI for the GKE Google Cloud.</p>
 
 <p>From $url we get the full package and install it in $dir local folder as a subdir of /root. Defaults are available for a simple call without parameters: gcloud_install()</p>
+
+<h2 id="ssh_update_transactional_system">ssh_update_transactional_system</h2>
+
+<p>ssh_update_transactional_system($host);</p>
+
+<p>Connect to the remote host <code>$instance</code> using ssh and update the system by running <code>zypper update</code> twice, in transactional mode. The first run will update the package manager, the second run will update the system. Transactional systems like SLE micro used <code>transactional_update up</code> and reboot.</p>
 
 
 </body>

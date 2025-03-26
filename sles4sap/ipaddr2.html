@@ -1,0 +1,832 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lib/sles4sap/ipaddr2.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel='stylesheet' href='../style.css' />
+</head>
+
+<body>
+
+
+
+<ul id="index"><li><a href="../index.html"><i>&lt;= Back to file list</i></a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a>
+    <ul>
+      <li><a href="#get_private_ip_range">get_private_ip_range</a></li>
+      <li><a href="#ipaddr2_azure_resource_group">ipaddr2_azure_resource_group</a></li>
+      <li><a href="#ipaddr2_azure_storage_account">ipaddr2_azure_storage_account</a></li>
+      <li><a href="#ipaddr2_cloudinit_create">ipaddr2_cloudinit_create</a></li>
+      <li><a href="#ipaddr2_infra_deploy">ipaddr2_infra_deploy</a></li>
+      <li><a href="#ipaddr2_bastion_pubip">ipaddr2_bastion_pubip</a></li>
+      <li><a href="#ipaddr2_bastion_ssh_addr">ipaddr2_bastion_ssh_addr</a></li>
+      <li><a href="#ipaddr2_bastion_key_accept">ipaddr2_bastion_key_accept</a></li>
+      <li><a href="#ipaddr2_internal_key_accept">ipaddr2_internal_key_accept</a></li>
+      <li><a href="#ipaddr2_internal_key_gen">ipaddr2_internal_key_gen</a></li>
+      <li><a href="#ipaddr2_internal_key_authorize">ipaddr2_internal_key_authorize</a></li>
+      <li><a href="#ipaddr2_deployment_sanity">ipaddr2_deployment_sanity</a></li>
+      <li><a href="#ipaddr2_os_sanity">ipaddr2_os_sanity</a></li>
+      <li><a href="#ipaddr2_cluster_sanity">ipaddr2_cluster_sanity</a></li>
+      <li><a href="#ipaddr2_os_connectivity_sanity">ipaddr2_os_connectivity_sanity</a></li>
+      <li><a href="#ipaddr2_cloudinit_sanity">ipaddr2_cloudinit_sanity</a></li>
+      <li><a href="#ipaddr2_cloudinit_logs">ipaddr2_cloudinit_logs</a></li>
+      <li><a href="#ipaddr2_os_network_sanity">ipaddr2_os_network_sanity</a></li>
+      <li><a href="#ipaddr2_os_ssh_sanity">ipaddr2_os_ssh_sanity</a></li>
+      <li><a href="#ipaddr2_ssh_bastion_assert_script_run">ipaddr2_ssh_bastion_assert_script_run</a></li>
+      <li><a href="#ipaddr2_ssh_bastion_script_run">ipaddr2_ssh_bastion_script_run</a></li>
+      <li><a href="#ipaddr2_ssh_bastion_script_output">ipaddr2_ssh_bastion_script_output</a></li>
+      <li><a href="#ipaddr2_ssh_internal_cmd">ipaddr2_ssh_internal_cmd</a></li>
+      <li><a href="#ipaddr2_ssh_internal">ipaddr2_ssh_internal</a></li>
+      <li><a href="#ipaddr2_ssh_internal_output">ipaddr2_ssh_internal_output</a></li>
+      <li><a href="#ipaddr2_cluster_create">ipaddr2_cluster_create</a></li>
+      <li><a href="#ipaddr2_scc_check">ipaddr2_scc_check</a></li>
+      <li><a href="#ipaddr2_scc_register">ipaddr2_scc_register</a></li>
+      <li><a href="#ipaddr2_configure_web_server">ipaddr2_configure_web_server</a></li>
+      <li><a href="#ipaddr2_refresh_repo">ipaddr2_refresh_repo</a></li>
+      <li><a href="#ipaddr2_deployment_logs">ipaddr2_deployment_logs</a></li>
+      <li><a href="#ipaddr2_infra_destroy">ipaddr2_infra_destroy</a></li>
+      <li><a href="#ipaddr2_get_internal_vm_name">ipaddr2_get_internal_vm_name</a></li>
+      <li><a href="#ipaddr2_get_internal_vm_private_ip">ipaddr2_get_internal_vm_private_ip</a></li>
+      <li><a href="#ipaddr2_get_worker_tmp_for_internal_vm">ipaddr2_get_worker_tmp_for_internal_vm</a></li>
+      <li><a href="#ipaddr2_crm_move">ipaddr2_crm_move</a></li>
+      <li><a href="#ipaddr2_crm_clear">ipaddr2_crm_clear</a></li>
+      <li><a href="#ipaddr2_wait_for_takeover">ipaddr2_wait_for_takeover</a></li>
+      <li><a href="#ipaddr2_get_web">ipaddr2_get_web</a></li>
+      <li><a href="#ipaddr2_test_master_vm">ipaddr2_test_master_vm</a></li>
+      <li><a href="#ipaddr2_test_other_vm">ipaddr2_test_other_vm</a></li>
+      <li><a href="#ipaddr2_network_peering_clean">ipaddr2_network_peering_clean</a></li>
+      <li><a href="#ipaddr2_network_peering_create">ipaddr2_network_peering_create</a></li>
+      <li><a href="#ipaddr2_add_server_repos_to_hosts">ipaddr2_add_server_repos_to_hosts</a></li>
+      <li><a href="#ipaddr2_patch_system">ipaddr2_patch_system</a></li>
+      <li><a href="#ipaddr2_scc_addons">ipaddr2_scc_addons</a></li>
+    </ul>
+  </li>
+</ul><h1>lib/sles4sap/ipaddr2.pm</h1>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Library to manage ipaddr2 tests</p>
+
+<h2 id="get_private_ip_range">get_private_ip_range</h2>
+
+<pre><code>my $range = get_private_ip_range();</code></pre>
+
+<p>count the private ip range and return</p>
+
+<h2 id="ipaddr2_azure_resource_group">ipaddr2_azure_resource_group</h2>
+
+<pre><code>my $rg = ipaddr2_azure_resource_group();</code></pre>
+
+<p>Get the Azure resource group name for this test</p>
+
+<h2 id="ipaddr2_azure_storage_account">ipaddr2_azure_storage_account</h2>
+
+<pre><code>my $storage_account = ipaddr2_azure_storage_account();</code></pre>
+
+<p>Get a unique storage account name. Not including the jobId result in error like: The storage account named ip2tstorageaccount already exists under the subscription</p>
+
+<h2 id="ipaddr2_cloudinit_create">ipaddr2_cloudinit_create</h2>
+
+<pre><code>my $cloud_init_file = ipaddr2_cloudinit_create();</code></pre>
+
+<p>Create the cloud-init.txt profile file</p>
+
+<dl>
+
+<dt id="scc_code---Optional-argument.-If-present-registration-will-be-added-in-bootcmd-section-of-the-cloud-init-profile-file.-Having-registration-enabled-is-particularly-important-for-BYOS-images:-this-profile-also-try-to-install-nginx-this-stage-needs-a-previous-registration"><b>scc_code</b> - Optional argument. If present, registration will be added in bootcmd section of the cloud-init profile file. Having registration enabled is particularly important for BYOS images: this profile also try to install nginx, this stage needs a previous registration.</dt>
+<dd>
+
+</dd>
+<dt id="nginx_root---Optional-argument:-default-is-srv-www-htdocs.-This-argument-allow-to-overwrite-the-location-where-the-index.html-generated-by-the-test-and-used-to-identify-each-node-is-stored.-As-the-test-is-not-using-any-nginx-configuration-file-this-location-has-to-match-to-the-default-root-folder-configured-by-the-particular-version-of-nginx-installed-in-the-SUT.-Default-value-is-was-value-for-nginx-installable-in-15sp5-and-sp6.-12sp5-needs-usr-share-nginx-html"><b>nginx_root</b> - Optional argument: default is <b>/srv/www/htdocs</b>. This argument allow to overwrite the location where the index.html, generated by the test and used to identify each node, is stored. As the test is not using any nginx configuration file, this location has to match to the default root folder configured by the particular version of nginx installed in the SUT. Default value is/was value for nginx installable in 15sp5 and sp6. 12sp5 needs /usr/share/nginx/html</dt>
+<dd>
+
+</dd>
+<dt id="external_repo---Optional-argument:-allow-to-add-a-PackageHub-product"><b>external_repo</b> - Optional argument: allow to add a PackageHub product</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_infra_deploy">ipaddr2_infra_deploy</h2>
+
+<pre><code>my $rg = ipaddr2_infra_deploy();</code></pre>
+
+<p>Create a deployment in Azure designed for this specific test.</p>
+
+<p>1. Create a resource group to contain all 2. Create a vnet and subnet in it 3. Create one Public IP 4. Create 2 VM to run the cluster, both running a web server and that are behind the LB 5. Create 1 additional VM that get 6. Create a Load Balancer with 2 VM in backend and with an IP as frontend</p>
+
+<dl>
+
+<dt id="region---existing-resource-group"><b>region</b> - existing resource group</dt>
+<dd>
+
+</dd>
+<dt id="os---existing-Load-balancer-NAME"><b>os</b> - existing Load balancer NAME</dt>
+<dd>
+
+</dd>
+<dt id="diagnostic---enable-diagnostic-features-if-1"><b>diagnostic</b> - enable diagnostic features if 1</dt>
+<dd>
+
+</dd>
+<dt id="cloudinit_profile---filename-of-the-cloud-init-profile.-Usually-this-one-is-the-return-value-of-ipaddr2_cloudinit_create.-Presence-of-this-optional-argument-also-enable-cloud-init-features-in-various-deployment-stages"><b>cloudinit_profile</b> - filename of the cloud-init profile. Usually this one is the return value of <b>ipaddr2_cloudinit_create</b>. Presence of this optional argument also enable cloud-init features in various deployment stages.</dt>
+<dd>
+
+</dd>
+<dt id="trusted_launch---Enable-or-disable-Trusted-Launch.-Default-1:-Enabled.-If-configured-to-0-the-result-in-az-vm-create-is-executed-with---security-type-Standard"><b>trusted_launch</b> - Enable or disable Trusted Launch. Default 1: Enabled. If configured to 0 the result in az vm create is executed with &#39;--security-type Standard&#39;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_bastion_pubip">ipaddr2_bastion_pubip</h2>
+
+<pre><code>my $bastion_ip = ipaddr2_bastion_pubip();</code></pre>
+
+<p>Get the only public IP in the deployment associated to the VM used as bastion.</p>
+
+<h2 id="ipaddr2_bastion_ssh_addr">ipaddr2_bastion_ssh_addr</h2>
+
+<pre><code>script_run(join(&#39; &#39;, &#39;ssh&#39;, ipaddr2_bastion_ssh_addr(), &#39;whoami&#39;);</code></pre>
+
+<p>Help to create ssh command that target the only VM in the deployment that has public IP.</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_bastion_key_accept">ipaddr2_bastion_key_accept</h2>
+
+<pre><code>ipaddr2_bastion_key_accept()</code></pre>
+
+<p>For the worker to accept the ssh key of the bastion</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it1"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_internal_key_accept">ipaddr2_internal_key_accept</h2>
+
+<pre><code>ipaddr2_internal_key_accept()</code></pre>
+
+<p>For the worker to accept the host key of the internal VMs. This function always use cloudadmin as user in any ssh connections.</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it2"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="key_checking---optional-parameter-allow-to-tune-value-for-StrictHostKeyChecking-ssh-option.-default-to-accept-new"><b>key_checking</b> - optional parameter allow to tune value for StrictHostKeyChecking ssh option. default to &#39;accept-new&#39;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_internal_key_gen">ipaddr2_internal_key_gen</h2>
+
+<pre><code>ipaddr2_internal_key_gen()</code></pre>
+
+<p>Create, on the /tmp folder of the Worker, two ssh key sets: one ssh key pair for each internal VM. Then upload in each internal VM the ssh key pair using scp and add pub key in the authorized_keys of the other internal VM. It also runs the first connection to accept the host keys. All this process it to have a suitable key set to allow password-less ssh between the two internal VM: it is later on needed by crm cluster init/join</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it3"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="key_checking---optional-parameter-allow-to-tune-value-for-StrictHostKeyChecking-ssh-option.-default-to-accept-new1"><b>key_checking</b> - optional parameter allow to tune value for StrictHostKeyChecking ssh option. default to &#39;accept-new&#39;</dt>
+<dd>
+
+</dd>
+<dt id="user---set-custom-user-name.-Default-is-cloudadmin.-User-root-activate-special-behavior.-This-argument-is-needed-as-crm-needs-keys-for-different-users-when-operate-in-root-or-rootless-mode"><b>user</b> - set custom user name. Default is cloudadmin. User root activate special behavior. This argument is needed as crm needs keys for different users when operate in root or rootless mode.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_internal_key_authorize">ipaddr2_internal_key_authorize</h2>
+
+<pre><code>ipaddr2_internal_key_authorize(src =&gt; &#39;1&#39;, dst =&gt; &#39;2&#39;, key_checking = &#39;no&#39;);</code></pre>
+
+<p>Add pub ssh key for a specific user to the same use authorized_key file on the other internal VM</p>
+
+<dl>
+
+<dt id="src---id-of-the-internal-VM-that-want-to-have-its-public-key-recorded-on-the-other"><b>src</b> - id of the internal VM that want to have its public key recorded on the other</dt>
+<dd>
+
+</dd>
+<dt id="src---id-of-the-internal-VM-has-to-add-the-other-VM-pub-key-in-its-authorized_key-list"><b>src</b> - id of the internal VM has to add the other VM pub key in its authorized_key list</dt>
+<dd>
+
+</dd>
+<dt id="key_checking---tune-value-for-StrictHostKeyChecking-ssh-option"><b>key_checking</b> - tune value for StrictHostKeyChecking ssh option.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it4"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="user---set-custom-user-name.-Default-is-cloudadmin.-User-root-activate-special-behavior.-This-argument-is-needed-as-crm-needs-keys-for-different-users-when-operate-in-root-ro-rootless-mode"><b>user</b> - set custom user name. Default is cloudadmin. User root activate special behavior. This argument is needed as crm needs keys for different users when operate in root ro rootless mode.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_deployment_sanity">ipaddr2_deployment_sanity</h2>
+
+<pre><code>ipaddr2_deployment_sanity()</code></pre>
+
+<p>Run some checks on the existing deployment using the az command line. die in case of failure</p>
+
+<h2 id="ipaddr2_os_sanity">ipaddr2_os_sanity</h2>
+
+<pre><code>ipaddr2_os_sanity()</code></pre>
+
+<p>Run some OS level checks on the various VMs composing the deployment. die in case of failure. Tests are targeting all the VM. Tests are independent by the cluster status.</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it5"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="user---user-expected-to-be-able-to-ssh-connect-password-less-from-one-internal-VM-to-the-other.-Default-is-cloudadmin"><b>user</b> - user expected to be able to ssh connect password-less from one internal VM to the other. Default is cloudadmin.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_cluster_sanity">ipaddr2_cluster_sanity</h2>
+
+<pre><code>ipaddr2_cluster_sanity()</code></pre>
+
+<p>Run some cluster level checks</p>
+
+<dl>
+
+<dt id="id---ID-of-the-internal-VM-where-to-run-the-crm-commands.-Default-is-1"><b>id</b> - ID of the internal VM where to run the crm commands. Default is 1.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it6"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_os_connectivity_sanity">ipaddr2_os_connectivity_sanity</h2>
+
+<pre><code>ipaddr2_os_connectivity_sanity()</code></pre>
+
+<p>Run some OS level checks about internal connectivity. die in case of failure</p>
+
+<p>- bastion has to be able to ping the internal VM using the internal private IP - bastion has to be able to ping the internal VM using the internal VM hostname</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it7"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_cloudinit_sanity">ipaddr2_cloudinit_sanity</h2>
+
+<pre><code>ipaddr2_cloudinit_sanity()</code></pre>
+
+<p>Run some checks about cloud-init</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it8"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_cloudinit_logs">ipaddr2_cloudinit_logs</h2>
+
+<pre><code>ipaddr2_cloudinit_logs()</code></pre>
+
+<p>Collect some cloud-init related logs</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it9"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_os_network_sanity">ipaddr2_os_network_sanity</h2>
+
+<pre><code>ipaddr2_os_network_sanity()</code></pre>
+
+<p>Check that private IP are in the network configuration on the internal VMs</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it10"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_os_ssh_sanity">ipaddr2_os_ssh_sanity</h2>
+
+<pre><code>ipaddr2_os_ssh_sanity()</code></pre>
+
+<p>Run some OS level checks on the various VMs ssh keys and configurations. die in case of failure</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it11"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="user---user-supposed-to-be-able-to-ssh-connect-password-less-from-one-internal-VM-to-the-other.-Value-for-this-argument-is-used-to-decide-the-home-folder-where-to-look-for-the-keys.-Default-is-cloudadmin.-User-root-activate-some-special-logic"><b>user</b> - user supposed to be able to ssh connect password-less from one internal VM to the other. Value for this argument is used to decide the home folder where to look for the keys. Default is cloudadmin. User root activate some special logic.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_ssh_bastion_assert_script_run">ipaddr2_ssh_bastion_assert_script_run</h2>
+
+<pre><code>ipaddr2_ssh_bastion_assert_script_run(
+    bastion_ip =&gt; &#39;1.2.3.4&#39;,
+    cmd =&gt; &#39;whoami&#39;);</code></pre>
+
+<p>run a command on the bastion using assert_script_run</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it12"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="cmd---command-to-run-there"><b>cmd</b> - command to run there</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_ssh_bastion_script_run">ipaddr2_ssh_bastion_script_run</h2>
+
+<pre><code>my $ret = ipaddr2_ssh_bastion_script_run(
+    bastion_ip =&gt; &#39;1.2.3.4&#39;,
+    cmd =&gt; &#39;whoami&#39;);</code></pre>
+
+<p>run a command on the bastion using script_run</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it13"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="cmd---command-to-run-there1"><b>cmd</b> - command to run there</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_ssh_bastion_script_output">ipaddr2_ssh_bastion_script_output</h2>
+
+<pre><code>my $ret = ipaddr2_ssh_bastion_script_output(
+    bastion_ip =&gt; &#39;1.2.3.4&#39;,
+    cmd =&gt; &#39;whoami&#39;);</code></pre>
+
+<p>run a command on the bastion using script_output</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it14"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="cmd---command-to-run-there2"><b>cmd</b> - command to run there</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_ssh_internal_cmd">ipaddr2_ssh_internal_cmd</h2>
+
+<pre><code>script_run(ipaddr2_ssh_internal_cmd(
+    id =&gt; 2,
+    bastion_ip =&gt; &#39;1.2.3.4&#39;,
+    cmd =&gt; &#39;whoami&#39;));</code></pre>
+
+<p>Compose an ssh command. Command is composed to be executed on one of the two internal VM. Command will use -J option to use the bastion as a proxy. This function does not really execute any command, it only return a string. Other functions can use result command string as input for various testapi functions, like assert_script_run or script_output.</p>
+
+<dl>
+
+<dt id="id---ID-of-the-internal-VM.-Used-to-compose-its-name-and-as-address-for-ssh"><b>id</b> - ID of the internal VM. Used to compose its name and as address for ssh.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it15"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="cmd---Command-to-be-run-on-the-internal-VM"><b>cmd</b> - Command to be run on the internal VM.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_ssh_internal">ipaddr2_ssh_internal</h2>
+
+<pre><code>ipaddr2_ssh_internal(
+    id =&gt; 2,
+    bastion_ip =&gt; &#39;1.2.3.4&#39;,
+    cmd =&gt; &#39;whoami&#39;,
+    method =&gt; script_run/assert_script_run);</code></pre>
+
+<p>run a command on one of the two internal VM through the bastion using the assert_script_run API</p>
+
+<dl>
+
+<dt id="id---ID-of-the-internal-VM.-Used-to-compose-its-name-and-as-address-for-ssh1"><b>id</b> - ID of the internal VM. Used to compose its name and as address for ssh.</dt>
+<dd>
+
+</dd>
+<dt id="cmd---Command-to-be-run-on-the-internal-VM1"><b>cmd</b> - Command to be run on the internal VM.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it16"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="timeout---Execution-timeout-default-90sec"><b>timeout</b> - Execution timeout, default 90sec</dt>
+<dd>
+
+</dd>
+<dt id="method---Specify-which-function-use-when-running-command"><b>method</b> - Specify which function use when running command</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_ssh_internal_output">ipaddr2_ssh_internal_output</h2>
+
+<pre><code>ipaddr2_ssh_internal_output(
+    id =&gt; 2,
+    bastion_ip =&gt; &#39;1.2.3.4&#39;,
+    cmd =&gt; &#39;whoami&#39;);</code></pre>
+
+<p>Runs $cmd through the bastion on one of the two internal VMs using script_output. Return the command output.</p>
+
+<dl>
+
+<dt id="id---ID-of-the-internal-VM.-Used-to-compose-its-name-and-as-address-for-ssh2"><b>id</b> - ID of the internal VM. Used to compose its name and as address for ssh.</dt>
+<dd>
+
+</dd>
+<dt id="cmd---Command-to-be-run-on-the-internal-VM2"><b>cmd</b> - Command to be run on the internal VM.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it17"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="timeout---Execution-timeout-default-90sec1"><b>timeout</b> - Execution timeout, default 90sec</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_cluster_create">ipaddr2_cluster_create</h2>
+
+<pre><code>ipaddr2_cluster_create();</code></pre>
+
+<p>Initialize and configure the Pacemaker cluster on the two internal nodes</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it18"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="rootless---Enable-or-disable-the-rootless-mode.-Default-is-normal-root-mode"><b>rootless</b> - Enable or disable the rootless mode. Default is normal root mode.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_scc_check">ipaddr2_scc_check</h2>
+
+<pre><code>my $is_registered = ipaddr2_scc_check(id =&gt; 1);</code></pre>
+
+<p>Check if image is registered by calling SUSEConnect -s. Return 1 if all modules are registered, 0 if at least one is not.</p>
+
+<dl>
+
+<dt id="id---VM-id-where-to-install-and-configure-the-web-server"><b>id</b> - VM id where to install and configure the web server</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it19"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_scc_register">ipaddr2_scc_register</h2>
+
+<pre><code>ipaddr2_scc_register(id =&gt; 1, scc_code =&gt; &#39;1234567890&#39;);</code></pre>
+
+<p>Register the image. (For the moment) it only support registercloudguest endpoint. Notice that this library also support registration through ipaddr2_infra_deploy by adding couple of lines to cloud-init configuration file.</p>
+
+<dl>
+
+<dt id="id---VM-id-where-to-install-and-configure-the-web-server1"><b>id</b> - VM id where to install and configure the web server</dt>
+<dd>
+
+</dd>
+<dt id="scc_code---registration-code"><b>scc_code</b> - registration code</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it20"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_configure_web_server">ipaddr2_configure_web_server</h2>
+
+<pre><code>ipaddr2_configure_web_server(id =&gt; 1);</code></pre>
+
+<p>This function is in charge to: 1. install the nginx package 2. create a web page file 3. enable and start the system</p>
+
+<dl>
+
+<dt id="id---VM-id-where-to-install-and-configure-the-web-server2"><b>id</b> - VM id where to install and configure the web server</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it21"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+<dt id="nginx_root---Optional-argument:-default-is-srv-www-htdocs.-This-argument-allows-to-overwrite-the-location-where-the-index.html-generated-by-the-test-and-used-to-identify-each-node-is-stored.-As-the-test-is-not-using-any-nginx-configuration-file-this-location-has-to-match-to-the-default-root-folder-configured-by-the-particular-version-of-nginx-installed-in-the-SUT.-Default-value-is-was-value-for-nginx-installable-in-15sp5-and-sp6.-12sp5-needs-usr-share-nginx-html"><b>nginx_root</b> - Optional argument: default is <b>/srv/www/htdocs</b>. This argument allows to overwrite the location where the index.html, generated by the test and used to identify each node, is stored. As the test is not using any nginx configuration file, this location has to match to the default root folder configured by the particular version of nginx installed in the SUT. Default value is/was value for nginx installable in 15sp5 and sp6. 12sp5 needs /usr/share/nginx/html</dt>
+<dd>
+
+</dd>
+<dt id="external_repo---Optional-argument:-allow-to-add-a-PackageHub-product1"><b>external_repo</b> - Optional argument: allow to add a PackageHub product</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_refresh_repo">ipaddr2_refresh_repo</h2>
+
+<pre><code>ipaddr2_refresh_repo(id =&gt; 1);</code></pre>
+
+<p>Call zypper refresh</p>
+
+<dl>
+
+<dt id="id---VM-id-where-to-install-and-configure-the-web-server3"><b>id</b> - VM id where to install and configure the web server</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_deployment_logs">ipaddr2_deployment_logs</h2>
+
+<pre><code>ipaddr2_deployment_logs()</code></pre>
+
+<p>Collect logs from the cloud infrastructure</p>
+
+<h2 id="ipaddr2_infra_destroy">ipaddr2_infra_destroy</h2>
+
+<pre><code>ipaddr2_infra_destroy();</code></pre>
+
+<p>Destroy the deployment by deleting the resource group</p>
+
+<h2 id="ipaddr2_get_internal_vm_name">ipaddr2_get_internal_vm_name</h2>
+
+<pre><code>my $vm_name = ipaddr2_get_internal_vm_name(id =&gt; 42);</code></pre>
+
+<p>compose and return a string for the vm name</p>
+
+<dl>
+
+<dt id="id---VM-id-number"><b>id</b> - VM id number</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_get_internal_vm_private_ip">ipaddr2_get_internal_vm_private_ip</h2>
+
+<pre><code>my $private_ip = ipaddr2_get_internal_vm_private_ip(id =&gt; 42);</code></pre>
+
+<p>compose and return a string representing the VM private IP</p>
+
+<dl>
+
+<dt id="id---VM-id-number1"><b>id</b> - VM id number</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_get_worker_tmp_for_internal_vm">ipaddr2_get_worker_tmp_for_internal_vm</h2>
+
+<pre><code>my $vm_tmp = ipaddr2_get_worker_tmp_for_internal_vm(42);</code></pre>
+
+<p>Return a path in /tmp of the worker used to store files associated two one of the internal VM</p>
+
+<h2 id="ipaddr2_crm_move">ipaddr2_crm_move</h2>
+
+<pre><code>ipaddr2_crm_move(destination =&gt; 2);</code></pre>
+
+<p>move the rsc_web_00 resource to the indicated node</p>
+
+<dl>
+
+<dt id="destination---VM-id-where-to-move-the-rsc_web_00-resource"><b>destination</b> - VM id where to move the rsc_web_00 resource</dt>
+<dd>
+
+</dd>
+<dt id="id---VM-id-where-to-run-the-command-not-so-important-as-long-as-it-is-in-the-cluster.-Default-1"><b>id</b> - VM id where to run the command, not so important as long as it is in the cluster. Default 1.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it22"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_crm_clear">ipaddr2_crm_clear</h2>
+
+<pre><code>ipaddr2_crm_clear();</code></pre>
+
+<p>clear all location constrain used during the test</p>
+
+<dl>
+
+<dt id="id---VM-id-where-to-run-the-command-not-so-important-as-long-as-it-is-in-the-cluster.-Default-11"><b>id</b> - VM id where to run the command, not so important as long as it is in the cluster. Default 1.</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it23"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_wait_for_takeover">ipaddr2_wait_for_takeover</h2>
+
+<pre><code>die &quot;Takeover does not happens in time&quot; unless  ipaddr2_wait_for_takeover(destination =&gt; 2);</code></pre>
+
+<p>Wait that web server is responding from the node indicated by id. This check is implemented running a curl request from the bastion and using the virtual IP address ar URL. This is possible because the webserver on each node is configured to return its hostname in the response. Return 1 as soon as it gets the id in the response. Return 0 if not within 10 minutes.</p>
+
+<dl>
+
+<dt id="destination---VM-id-that-from-where-the-web-server-response-is-expected-to-come-from"><b>destination</b> - VM id that from where the web server response is expected to come from</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it24"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_get_web">ipaddr2_get_web</h2>
+
+<pre><code>ipaddr2_get_web(str_match =&gt; &#39;openqa_vm_01&#39;);</code></pre>
+
+<p>Runs a curl request from the bastion and using the virtual IP address as URL. Return result of searching str_match in the curl response</p>
+
+<dl>
+
+<dt id="web_url---webserver-url"><b>web_url</b> - webserver url</dt>
+<dd>
+
+</dd>
+<dt id="str_match---string-to-search-in-the-curl-output"><b>str_match</b> - string to search in the curl output</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it25"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_test_master_vm">ipaddr2_test_master_vm</h2>
+
+<pre><code>ipaddr2_test_master_vm(id =&gt; 2);</code></pre>
+
+<p>Check the status on the VM that is supposed to have the resources.</p>
+
+<dl>
+
+<dt id="id---VM-id-that-is-expected-to-be-master"><b>id</b> - VM id that is expected to be master</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it26"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_test_other_vm">ipaddr2_test_other_vm</h2>
+
+<pre><code>ipaddr2_test_other_vm(id =&gt; 1);</code></pre>
+
+<p>Check the status on the VM that is supposed not to have the resources.</p>
+
+<dl>
+
+<dt id="id---VM-id-that-is-expected-not-to-be-master"><b>id</b> - VM id that is expected not to be master</dt>
+<dd>
+
+</dd>
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it27"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_network_peering_clean">ipaddr2_network_peering_clean</h2>
+
+<pre><code>ipaddr2_network_peering_clean(ibsm_rg =&gt; );</code></pre>
+
+<p>Cleanup the network peering if needed.</p>
+
+<dl>
+
+<dt id="ibsm_rg---Resource-group-of-the-IBSm"><b>ibsm_rg</b> - Resource group of the IBSm</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_network_peering_create">ipaddr2_network_peering_create</h2>
+
+<pre><code>ipaddr2_network_peering_create(ibsm_rg =&gt; &#39;IBSmMyRg&#39;);</code></pre>
+
+<p>Create network peering</p>
+
+<dl>
+
+<dt id="ibsm_rg---Resource-group-of-the-IBSm1"><b>ibsm_rg</b> - Resource group of the IBSm</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ipaddr2_add_server_repos_to_hosts">ipaddr2_add_server_repos_to_hosts</h2>
+
+<pre><code>ipaddr2_add_server_repos_to_hosts(ibsm_ip =&gt; , incident_repo =&gt; );</code></pre>
+
+<p>Add download.suse.de server to hosts by specifying IBSM address</p>
+
+<h2 id="ipaddr2_patch_system">ipaddr2_patch_system</h2>
+
+<pre><code>ipaddr2_patch_system();</code></pre>
+
+<p>Patch system</p>
+
+<h2 id="ipaddr2_scc_addons">ipaddr2_scc_addons</h2>
+
+<pre><code>ipaddr2_scc_addons();</code></pre>
+
+<p>Register addons on SUT</p>
+
+<dl>
+
+<dt id="bastion_ip---Public-IP-address-of-the-bastion.-Calculated-if-not-provided.-Providing-it-as-an-argument-is-recommended-in-order-to-avoid-having-to-query-Azure-to-get-it28"><b>bastion_ip</b> - Public IP address of the bastion. Calculated if not provided. Providing it as an argument is recommended in order to avoid having to query Azure to get it.</dt>
+<dd>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

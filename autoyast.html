@@ -17,6 +17,7 @@
       <li><a href="#expand_patterns">expand_patterns</a></li>
       <li><a href="#get_product_version">get_product_version</a></li>
       <li><a href="#expand_addons">expand_addons</a></li>
+      <li><a href="#expand_extra_repos">expand_extra_repos</a></li>
       <li><a href="#expand_template">expand_template</a></li>
       <li><a href="#init_autoyast_profile">init_autoyast_profile</a></li>
       <li><a href="#validate_autoyast_profile">validate_autoyast_profile</a></li>
@@ -34,6 +35,10 @@
       <li><a href="#expand_version">expand_version</a></li>
       <li><a href="#adjust_network_conf">adjust_network_conf</a></li>
       <li><a href="#expand_variables">expand_variables</a></li>
+      <li><a href="#adjust_user_password">adjust_user_password</a></li>
+      <li><a href="#expand_agama_secrets">expand_agama_secrets</a></li>
+      <li><a href="#expand_agama_profile">expand_agama_profile</a></li>
+      <li><a href="#generate_json_profile">generate_json_profile</a></li>
       <li><a href="#upload_profile">upload_profile</a></li>
       <li><a href="#inject_registration">inject_registration</a></li>
       <li><a href="#test_ayp_url">test_ayp_url</a></li>
@@ -65,6 +70,15 @@
 <pre><code>expand_addons();</code></pre>
 
 <p>Returns hash of all <code>SCC_ADDONS</code> with name, version and architecture.</p>
+
+<h2 id="expand_extra_repos">expand_extra_repos</h2>
+
+<pre><code>expand_extra_repo();</code></pre>
+
+<p>Returns array of hashes of all <code>EXTRA_CUSTOMER_REPOS</code> with repo name and url.</p>
+
+<pre><code>e.g. from EXTRA_CUSTOMER_REPOS
+15-SP4-TERADATA-Updates;http://dist.suse.de/ibs/SUSE/Updates/SLE-Product-SLES/15-SP4-TERADATA/x86_64/update/</code></pre>
 
 <h2 id="expand_template">expand_template</h2>
 
@@ -246,6 +260,38 @@ Expand variables from job settings which do not require further processing
 
 $profile is the autoyast profile &#39;autoinst.xml&#39;.</code></pre>
 
+<h2 id="adjust_user_password">adjust_user_password</h2>
+
+<pre><code>adjust_user_password($profile);
+
+Password is defined at first, see lib/main_common.pm like below:
+---
+$testapi::password = &quot;xxxxxx&quot;;
+$testapi::password = get_var(&quot;PASSWORD&quot;) if defined get_var(&quot;PASSWORD&quot;);
+---
+
+$profile is the autoyast profile &#39;autoinst.xml&#39;.</code></pre>
+
+<h2 id="expand_agama_secrets">expand_agama_secrets</h2>
+
+<pre><code>expand_agama_secrets($profile);
+
+Expand secret variables from job settings which do not require further processing
+
+$profile is the autoyast profile &#39;autoinst.xml&#39;.</code></pre>
+
+<h2 id="expand_agama_profile">expand_agama_profile</h2>
+
+<pre><code>expand_agama_profile($profile, $profile_expanded);
+
+Return the PATH of profile with expanded vars</code></pre>
+
+<h2 id="generate_json_profile">generate_json_profile</h2>
+
+<pre><code>generate_json_profile();
+
+Return the URL of generated JSON profile</code></pre>
+
 <h2 id="upload_profile">upload_profile</h2>
 
 <pre><code>upload_profile(profile =&gt; $profile, path =&gt; $path)
@@ -280,7 +326,7 @@ Test if the autoyast profile url is reachable, before the autoyast installation 
 
 <pre><code>prepare_ay_file(profile =&gt; $profile, path =&gt; $path)</code></pre>
 
-<p>Get profile from autoyast template Map version names Get IP address from system variables Get values from SCC_REGCODE SCC_REGCODE_HA SCC_REGCODE_GEO SCC_REGCODE_HPC SCC_URL ARCH LOADER_TYPE Modify profile with obtained values Return new path in case of using AutoYaST templates</p>
+<p>Get profile from autoyast template Map version names Get IP address from system variables Get values from SCC_REGCODE SCC_REGCODE_HA SCC_REGCODE_GEO SCC_REGCODE_HPC SCC_URL ARCH LOADER_TYPE Adjust user password Modify profile with obtained values Return new path in case of using AutoYaST templates</p>
 
 <pre><code>$path is the path of the AutoYaST profile or one of the xml files when
 using rules and classes.</code></pre>

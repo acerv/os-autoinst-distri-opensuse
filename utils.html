@@ -41,9 +41,11 @@
       <li><a href="#zypper_search">zypper_search</a></li>
       <li><a href="#zypper_repos">zypper_repos</a></li>
       <li><a href="#zypper_patches">zypper_patches</a></li>
+      <li><a href="#"></a></li>
       <li><a href="#set_zypper_lock_timeout">set_zypper_lock_timeout</a></li>
-      <li><a href="#workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</a></li>
+      <li><a href="#unlock_bootloader">unlock_bootloader</a></li>
       <li><a href="#is_boot_encrypted">is_boot_encrypted</a></li>
+      <li><a href="#need_unlock_after_bootloader">need_unlock_after_bootloader</a></li>
       <li><a href="#is_bridged_networking">is_bridged_networking</a></li>
       <li><a href="#set_bridged_networking">set_bridged_networking</a></li>
       <li><a href="#print_ip_info">print_ip_info</a></li>
@@ -65,6 +67,7 @@
       <li><a href="#get_x11_console_tty">get_x11_console_tty</a></li>
       <li><a href="#arrays_differ">arrays_differ</a></li>
       <li><a href="#arrays_subset">arrays_subset</a></li>
+      <li><a href="#ensure_testuser_present-Ensure-testuser-UID-1000-is-present-on-the-system">ensure_testuser_present Ensure testuser (UID 1000) is present on the system.</a></li>
       <li><a href="#ensure_serialdev_permissions">ensure_serialdev_permissions</a></li>
       <li><a href="#disable_serial_getty">disable_serial_getty</a></li>
       <li><a href="#exec_and_insert_password">exec_and_insert_password</a></li>
@@ -79,19 +82,21 @@
       <li><a href="#script_output_retry">script_output_retry</a></li>
       <li><a href="#validate_script_output_retry">validate_script_output_retry</a></li>
       <li><a href="#script_run_interactive">script_run_interactive</a></li>
+      <li><a href="#download_script">download_script</a></li>
       <li><a href="#create_btrfs_subvolume">create_btrfs_subvolume</a></li>
       <li><a href="#create_raid_loop_device">create_raid_loop_device</a></li>
       <li><a href="#file_content_replace">file_content_replace</a></li>
       <li><a href="#assert_file_content-assert_file_content-path-value">assert_file_content assert_file_content( &quot;path&quot;, value );</a></li>
       <li><a href="#ensure_ca_certificates_suse_installed-ensure_ca_certificates_suse_installed">ensure_ca_certificates_suse_installed ensure_ca_certificates_suse_installed();</a></li>
       <li><a href="#install_patterns-install_patterns">install_patterns install_patterns();</a></li>
+      <li><a href="#ensure_service_disabled-ensure_service_disabled">ensure_service_disabled ensure_service_disabled();</a></li>
       <li><a href="#permit_root_ssh-permit_root_ssh">permit_root_ssh permit_root_ssh();</a></li>
       <li><a href="#permit_root_ssh_in_sol-permit_root_ssh_in_sol">permit_root_ssh_in_sol permit_root_ssh_in_sol();</a></li>
       <li><a href="#cleanup_disk_space-cleanup_disk_space">cleanup_disk_space cleanup_disk_space();</a></li>
       <li><a href="#package_upgrade_check-package_upgrade_check">package_upgrade_check package_upgrade_check();</a></li>
       <li><a href="#validate_result-_validate_result">_validate_result _validate_result();</a></li>
       <li><a href="#generate_results-generate_results">generate_results generate_results();</a></li>
-      <li><a href="#pars_results-pars_results">pars_results pars_results();</a></li>
+      <li><a href="#parse_test_results-parse_test_results">parse_test_results parse_test_results();</a></li>
       <li><a href="#test_case-test_case-name-description-result">test_case test_case($name, $description, $result);</a></li>
       <li><a href="#remount_tmp_if_ro">remount_tmp_if_ro</a></li>
       <li><a href="#detect_bsc_1063638">detect_bsc_1063638</a></li>
@@ -99,6 +104,21 @@
       <li><a href="#script_finish_io">script_finish_io</a></li>
       <li><a href="#handle_screen-handle_screen-needles-handler_map-assert-assert-max_loops-max_loops">handle_screen handle_screen($needles, $handler_map [, assert =&gt; $assert] [, max_loops =&gt; $max_loops] [...]);</a></li>
       <li><a href="#define_secret_variable-define_secret_variable-var_name-var_value-define_secret_variable-sets-a-hidden-environment-variable-without-exposing-it-to-openQA.-This-function-is-useful-to-hide-secrets-from-openQA-by-setting-them-as-an-accessible-environment-variable-but-without-any-traces-in-the-output-terminals.-e.g.-define_secret_variable-SECRET-get_var-_SECRET_VARIABLE-would-store-the-openQA-variable-_SECRET_VARIABLE-into-the-SECRET-environment-variable-which-can-be-used-afterwards-by-using-SECRET">define_secret_variable define_secret_variable($var_name, $var_value); define_secret_variable sets a hidden environment variable without exposing it to openQA. This function is useful to hide secrets from openQA by setting them as an accessible environment variable, but without any traces in the output terminals. e.g. define_secret_variable(&#39;SECRET&#39;, get_var(&#39;_SECRET_VARIABLE&#39;)) would store the openQA variable &#39;_SECRET_VARIABLE&#39; into the &#39;$SECRET&#39; environment variable, which can be used afterwards by using $SECRET.</a></li>
+      <li><a href="#ping_size_check-ping_size_check-target-size-ping_size_check-will-ping-the-defined-target-with-different-and-increasing-sizes-with-disabled-packet-fragmentation.-If-a-size-is-specified-it-will-do-single-ping-check-with-one-size">ping_size_check ping_size_check($target, $size); ping_size_check will ping the defined target with different and increasing sizes with disabled packet fragmentation. If a size is specified, it will do single ping check with one size.</a></li>
+      <li><a href="#write_sut_file">write_sut_file</a></li>
+      <li><a href="#is_ipxe_boot">is_ipxe_boot</a></li>
+      <li><a href="#is_uefi_boot">is_uefi_boot</a></li>
+      <li><a href="#is_usb_boot">is_usb_boot</a></li>
+      <li><a href="#remove_efiboot_entry">remove_efiboot_entry</a></li>
+      <li><a href="#empty_usb_disks">empty_usb_disks</a></li>
+      <li><a href="#upload_y2logs">upload_y2logs</a></li>
+      <li><a href="#enable_persistent_kernel_log">enable_persistent_kernel_log</a></li>
+      <li><a href="#enable_console_kernel_log">enable_console_kernel_log</a></li>
+      <li><a href="#is_disk_image">is_disk_image</a></li>
+      <li><a href="#is_ipxe_with_disk_image">is_ipxe_with_disk_image</a></li>
+      <li><a href="#is_reboot_needed">is_reboot_needed</a></li>
+      <li><a href="#install_extra_packages">install_extra_packages</a></li>
+      <li><a href="#render_autoinst_url">render_autoinst_url</a></li>
     </ul>
   </li>
 </ul><h1>lib/utils.pm</h1>
@@ -319,23 +339,37 @@ zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_
 
 <p>Run <code>zypper patches</code> with given command line arguments and parse the output into an array of hashes.</p>
 
+<h2 id=""></h2>
+
+<pre><code>zypper_install_available(@packages);</code></pre>
+
+<p>Install all available packages from the given list. Packages not found in enabled repositories will be skipped. Package availability is tested by exact name match.</p>
+
 <h2 id="set_zypper_lock_timeout">set_zypper_lock_timeout</h2>
 
 <pre><code>set_zypper_lock_timeout($timeout);</code></pre>
 
 <p>Set how many seconds zypper will wait for other processes to release the system lock. If this function is called without arguments, it&#39;ll set timeout to 300 seconds.</p>
 
-<h2 id="workaround_type_encrypted_passphrase">workaround_type_encrypted_passphrase</h2>
+<h2 id="unlock_bootloader">unlock_bootloader</h2>
 
-<pre><code>workaround_type_encrypted_passphrase();</code></pre>
+<pre><code>unlock_bootloader();</code></pre>
 
-<p>Record soft-failure for unresolved feature fsc#320901 which we think is important and then unlock encrypted boot partitions if we expect it to be encrypted. This condition is met on &#39;storage-ng&#39; which by default puts the boot partition within the encrypted LVM same as in test scenarios where we explicitly create an LVM including boot (<code>FULL_LVM_ENCRYPT</code>). <code>ppc64le</code> was already doing the same by default also in the case of pre-storage-ng but not anymore for storage-ng.</p>
+<p>Unlock bootloader if boot partition is encrypted.</p>
 
 <h2 id="is_boot_encrypted">is_boot_encrypted</h2>
 
 <pre><code>is_boot_encrypted();</code></pre>
 
 <p>This will return <code>1</code> if the env variables suggest that the boot partition is encrypted.</p>
+
+<h2 id="need_unlock_after_bootloader">need_unlock_after_bootloader</h2>
+
+<pre><code>need_unlock_after_bootloader();</code></pre>
+
+<p>Whether the disk encryption password(s) need to be entered during system boot (e.g. plymouth or systemd-cryptsetup text prompt).</p>
+
+<p>With newer grub2 (in TW and SLE15-SP6 currently), if root disk is encrypted and contains `/boot`, entering the passphrase in GRUB2 is enough. The key is passed on during boot, so it&#39;s not asked for a second time. We need to enter the passphrase again if there are separate partitions encrypted without LVM configuration (cr_swap,cr_home etc).</p>
 
 <h2 id="is_bridged_networking">is_bridged_networking</h2>
 
@@ -478,6 +512,10 @@ zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_
 <p>Compares two arrays passed by reference to identify if array1 is a subset of array2.</p>
 
 <p>Returns resulting array containing items of array1 that do not exist in array2. If all the items of array1 exist in array2, returns an empty array (which means array1 is a subset of array2).</p>
+
+<h2 id="ensure_testuser_present-Ensure-testuser-UID-1000-is-present-on-the-system">ensure_testuser_present Ensure testuser (UID 1000) is present on the system.</h2>
+
+<p>If the user is not present, it will create it with the default password</p>
 
 <h2 id="ensure_serialdev_permissions">ensure_serialdev_permissions</h2>
 
@@ -628,6 +666,12 @@ zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_
 
 <p>If the first argument is <code>undef</code>, only the sencond part will be processed - to match output and react. If the second argument is undef, the first part will be processed - to run the command without interaction with terminal output. This is useful for some situation when you want to do more between inputing command and the following interaction, eg. switch TTYs or detach the screen.</p>
 
+<h2 id="download_script">download_script</h2>
+
+<pre><code>download_script($srcfile, [$destfile]);</code></pre>
+
+<p>Download <code>$srcfile</code> script from worker data directory to the SUT and save it as <code>$destfile</code>, with executable bit set. If <code>$destfile</code> is not set, the default is to save the script file under the same name in the current directory.</p>
+
 <h2 id="create_btrfs_subvolume">create_btrfs_subvolume</h2>
 
 <pre><code>create_btrfs_subvolume();</code></pre>
@@ -667,6 +711,10 @@ zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_
 
 <p>This functions install extra patterns if var PATTERNS is set.</p>
 
+<h2 id="ensure_service_disabled-ensure_service_disabled">ensure_service_disabled ensure_service_disabled();</h2>
+
+<p>Make sure service is disabled before test.</p>
+
 <h2 id="permit_root_ssh-permit_root_ssh">permit_root_ssh permit_root_ssh();</h2>
 
 <p>Due to bsc#1173067, openssh now no longer allows RootLogin using password auth on Tumbleweed, the latest SLE16 and Leap16 will sync with Tumbleweed as well.</p>
@@ -695,13 +743,13 @@ zypper_ar(&#39;https://download.opensuse.org/repositories/devel:/kubic/openSUSE_
 
 <p>This function is used to construct a hash suitable for representation in junit xml format.</p>
 
-<h2 id="pars_results-pars_results">pars_results pars_results();</h2>
+<h2 id="parse_test_results-parse_test_results">parse_test_results parse_test_results();</h2>
 
 <p>Takes <code>test</code> as an argument. <code>test</code> is an array of hashes which contain the test results. They usually are generated by <code>generate_results</code>. Those are parsed and create the junit xml representation.</p>
 
 <h2 id="test_case-test_case-name-description-result">test_case test_case($name, $description, $result);</h2>
 
-<p><code>test_case</code> can produce a data_structure which <code>pars_results</code> can utilize. Using <code>test_case</code> in an OpenQA module you are able to /name/ and describe the whole test as subtasks, in a XUnit format.</p>
+<p><code>test_case</code> can produce a data_structure which <code>parse_test_results</code> can utilize. Using <code>test_case</code> in an OpenQA module you are able to /name/ and describe the whole test as subtasks, in a XUnit format.</p>
 
 <h2 id="remount_tmp_if_ro">remount_tmp_if_ro</h2>
 
@@ -748,6 +796,93 @@ script_finish_io(exitcode =&gt; [12]);</code></pre>
 <p>Note that you may need to set <code>timeout</code> keyword argument if you set <code>$assert</code> to false because <code>check_screen()</code> has <code>$timeout=0</code> by default.</p>
 
 <h2 id="define_secret_variable-define_secret_variable-var_name-var_value-define_secret_variable-sets-a-hidden-environment-variable-without-exposing-it-to-openQA.-This-function-is-useful-to-hide-secrets-from-openQA-by-setting-them-as-an-accessible-environment-variable-but-without-any-traces-in-the-output-terminals.-e.g.-define_secret_variable-SECRET-get_var-_SECRET_VARIABLE-would-store-the-openQA-variable-_SECRET_VARIABLE-into-the-SECRET-environment-variable-which-can-be-used-afterwards-by-using-SECRET">define_secret_variable define_secret_variable($var_name, $var_value); define_secret_variable sets a hidden environment variable without exposing it to openQA. This function is useful to hide secrets from openQA by setting them as an accessible environment variable, but without any traces in the output terminals. e.g. define_secret_variable(&#39;SECRET&#39;, get_var(&#39;_SECRET_VARIABLE&#39;)) would store the openQA variable &#39;_SECRET_VARIABLE&#39; into the &#39;$SECRET&#39; environment variable, which can be used afterwards by using $SECRET.</h2>
+
+<h2 id="ping_size_check-ping_size_check-target-size-ping_size_check-will-ping-the-defined-target-with-different-and-increasing-sizes-with-disabled-packet-fragmentation.-If-a-size-is-specified-it-will-do-single-ping-check-with-one-size">ping_size_check ping_size_check($target, $size); ping_size_check will ping the defined target with different and increasing sizes with disabled packet fragmentation. If a size is specified, it will do single ping check with one size.</h2>
+
+<p>Mandatory parameter: <code>target</code> destination of ping target.</p>
+
+<p>Optional parameter: <code>size</code> ping size for single ping test.</p>
+
+<h2 id="write_sut_file">write_sut_file</h2>
+
+<pre><code>write_sut_file($path, $contents)</code></pre>
+
+<p>Write <code>$contents</code> to a file <code>$path</code> on the SUT. The directories in <code>$path</code> must already exist.</p>
+
+<h2 id="is_ipxe_boot">is_ipxe_boot</h2>
+
+<p>Returns true if the current instance is in IPXE boot mode</p>
+
+<h2 id="is_uefi_boot">is_uefi_boot</h2>
+
+<p>Returns true if the current instance is in UEFI boot mode</p>
+
+<h2 id="is_usb_boot">is_usb_boot</h2>
+
+<pre><code>is_usb_boot();</code></pre>
+
+<p>This will return <code>1</code> if the env variables suggest that it boots from USB.</p>
+
+<h2 id="remove_efiboot_entry">remove_efiboot_entry</h2>
+
+<pre><code>remove_efiboot_entry(boot_entry =&gt; &#39;entry&#39;);</code></pre>
+
+<p>Remove provided efiboot entry name by its corresponding boot number.</p>
+
+<h2 id="empty_usb_disks">empty_usb_disks</h2>
+
+<pre><code>empty_usb_disks(usb_disks =&gt; &#39;disk1 disk2&#39;);</code></pre>
+
+<p>Empty contents of all plugged-in usb disks by formatting them. Passed argument usb_disks takes value if the form of &quot;usb_disk1 usb_disk2 usb_disk3&quot;. Remove all plugged-in usb disks if usb_disks is empty.</p>
+
+<h2 id="upload_y2logs">upload_y2logs</h2>
+
+<pre><code>upload_y2logs(file =&gt; &#39;/tmp/y2logs123.tar.bz2&#39;, failok =&gt; 1);</code></pre>
+
+<p>No arguments are required, y2logs can be created and uploaded with custom <code>file</code> name, upload_logs can fail and continue with failok <code>failok</code> set to 1</p>
+
+<h2 id="enable_persistent_kernel_log">enable_persistent_kernel_log</h2>
+
+<pre><code>enable_persistent_kernel_log(service =&gt; &#39;log_service_name&#39;,
+    config =&gt; &#39;config_file_path&#39;, log =&gt; &#39;log_file_path&#39;);</code></pre>
+
+<p>For system that uses rsyslog to manage log facility, kernel log by default is not stored on persistent storage. In order to enable persistent kernel log, loading imklog.so module and specifying desired log file in config file /etc/rsyslog.conf should be performed. Arguments service, config and log provide flexibility to use different log management appliances.</p>
+
+<h2 id="enable_console_kernel_log">enable_console_kernel_log</h2>
+
+<pre><code>enable_console_kernel_log;</code></pre>
+
+<p>By default only those kernel logs level of which is lower than default value will be printed out onto serial console. If user prefers to have all kernel messages printed out onto serial console, ignore_loglevel, loglvl or guest_loglvl setting should be put onto kernel command line and setting /proc/sys/kernel/printk should have value like 8 which is greater than the highest kernel log level.</p>
+
+<h2 id="is_disk_image">is_disk_image</h2>
+
+<pre><code>is_disk_image;</code></pre>
+
+<p>Identify whether test runs with linux disk image built by kiwi or similar programs. HDD_1 is usually used if disk image is available on openQA server. Test run attempts downloading HDD_1, failure of which leads to failed test run. INSTALL_HDD_IMAGE is introduced for installation with disk image which might be located somewhere else and also more flexibility.</p>
+
+<h2 id="is_ipxe_with_disk_image">is_ipxe_with_disk_image</h2>
+
+<pre><code>is_ipxe_with_disk_image;</code></pre>
+
+<p>Identify whether test runs boots from ipxe and deploy linux disk image built by kiwi or similar programs</p>
+
+<h2 id="is_reboot_needed">is_reboot_needed</h2>
+
+<pre><code>is_reboot_needed(username =&gt; &#39;name&#39;, address =&gt; &#39;address&#39;);</code></pre>
+
+<p>Identify whether rebooting needed after system being changed. Arguments username and address can be used to specify remote user and host if operation is not local.</p>
+
+<h2 id="install_extra_packages">install_extra_packages</h2>
+
+<pre><code>install_extra_packages(repos =&gt; &#39;repositories&#39;, packages =&gt; &#39;packages&#39;);</code></pre>
+
+<p>Install extra packages that are only available in extra repositories. User may need to install some useful utilities from other repositories to facilitate test run. At the same time, it also needs to ensure such operations will not alter existing system. Althought user should not be prevented from installing legitimate tools and utilities, it is expected that use of additional packages should be limited to the minimum and their impact should be paid attention to. User can specify required repositories and pacakges via arguments, repos and packages or settings INSTALL_OTHER_REPOS and INSTALL_OTHER_PACKAGES.</p>
+
+<h2 id="render_autoinst_url">render_autoinst_url</h2>
+
+<pre><code>render_autoinst_url(url =&gt; &#39;openQA url&#39;);</code></pre>
+
+<p>In order to avoid downloading resources directly from openQA instance, rendering autoinst url from given openQA url is necessary. Argument url accetps legal HTTP url addresses, but it will be returned directly without rendering if it is not an openQA url.</p>
 
 
 </body>

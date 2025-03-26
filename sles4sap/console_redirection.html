@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lib/sles4sap/console_redirection.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel='stylesheet' href='../style.css' />
+</head>
+
+<body>
+
+
+
+<ul id="index"><li><a href="../index.html"><i>&lt;= Back to file list</i></a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a>
+    <ul>
+      <li><a href="#handle_login_prompt">handle_login_prompt</a></li>
+      <li><a href="#set_serial_term_prompt">set_serial_term_prompt</a></li>
+      <li><a href="#connect_target_to_serial">connect_target_to_serial</a></li>
+      <li><a href="#disconnect_target_from_serial">disconnect_target_from_serial</a></li>
+      <li><a href="#check_serial_redirection">check_serial_redirection</a></li>
+    </ul>
+  </li>
+</ul><h1>lib/sles4sap/console_redirection.pm</h1>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Library that enables console redirection and file transfers from worker based VM to another host. Can be used for cases where worker VM is not the target host for API calls and command execution, but serves only as a jumphost. Console redirection is achieved by ssh remote port forwarding and redirecting remote VM ssh session stdin and stdout outputs into serial terminal of the worker VM.</p>
+
+<p><b>USAGE:</b> 1. Set mandatory OpenQA parameters (they can be as well provided directly as named arguments in functions): - REDIRECT_DESTINATION_USER: SSH user for remote SUT - REDIRECT_DESTINATION_IP: IP address for remote SUT 2. Establish console redirection to SUT host by calling function <b>connect_target_to_serial</b> - all test code is now transparently executed on SUT instead of worker VM - from OpenQA perspective SUT is the worker VM 3. Disable console redirection from SUT host by calling function <b>disconnect_target_from_serial</b></p>
+
+<h2 id="handle_login_prompt">handle_login_prompt</h2>
+
+<pre><code>handle_login_prompt();</code></pre>
+
+<p>Detects if login prompt appears and types the password. In case of ssh keys being in place and command prompt appears, the function does not type anything.</p>
+
+<h2 id="set_serial_term_prompt">set_serial_term_prompt</h2>
+
+<pre><code>set_serial_term_prompt();</code></pre>
+
+<p>Set expected serial prompt according to user which is currently active. This changes global setting $testapi::distri-&gt;{serial_term_prompt} which is important for calls like wait_for_serial.</p>
+
+<h2 id="connect_target_to_serial">connect_target_to_serial</h2>
+
+<pre><code>connect_target_to_serial( [, ssh_user=&gt;ssh_user, destination_ip=&gt;$destination_ip]);</code></pre>
+
+<p><b>ssh_user</b>: SSH login user for <b>destination_ip</b> - default value is defined by OpenQA parameter REDIRECT_DESTINATION_USER</p>
+
+<p><b>destination_ip</b>: Destination host IP - default value is defined by OpenQA parameter REDIRECT_DESTINATION_IP</p>
+
+<p><b>switch_root</b>: Switch to root after login with unprivileged user with &#39;sudo su -&#39;. User <b>MUST</b> have passwordless sudo permission.</p>
+
+<p><b>fail_ok</b>: Do not die, return 0 instead. Good for verifying if redirection works.</p>
+
+<p>Establishes ssh connection to destination host and redirects serial output to serial console on worker VM. Connection activates remote port forwarding of OpenQA QEMUPORT+1. This allows running standard OpenQA modules directly on a remote host accessed from worker VM via SSH. Returns 1 if redirection was successful, or dies if redirection fails. If <b>fail_ok</b> is set to true, function does not fail, but returns 0.</p>
+
+<h2 id="disconnect_target_from_serial">disconnect_target_from_serial</h2>
+
+<pre><code>disconnect_target_from_serial();</code></pre>
+
+<p>Disconnects target from serial console by typing &#39;exit&#39; command until host machine ID matches ID of the worker VM.</p>
+
+<h2 id="check_serial_redirection">check_serial_redirection</h2>
+
+<pre><code>check_serial_redirection();</code></pre>
+
+<p>Checks if serial redirection is currently active by comparing worker VM machine id against id returned from serial console. VM ID is collected by opening &#39;log-console&#39; which is not redirected.</p>
+
+
+</body>
+
+</html>
+
+

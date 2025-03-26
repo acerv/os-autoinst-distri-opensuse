@@ -1,0 +1,474 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lib/sles4sap/sap_deployment_automation_framework/deployment.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel='stylesheet' href='../../style.css' />
+</head>
+
+<body>
+
+
+
+<ul id="index"><li><a href="../../index.html"><i>&lt;= Back to file list</i></a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a>
+    <ul>
+      <li><a href="#log_command_output">log_command_output</a></li>
+      <li><a href="#az_login">az_login</a></li>
+      <li><a href="#create_sdaf_os_var_file">create_sdaf_os_var_file</a></li>
+      <li><a href="#set_os_variable">set_os_variable</a></li>
+      <li><a href="#get_os_variable">get_os_variable</a></li>
+      <li><a href="#set_common_sdaf_os_env">set_common_sdaf_os_env</a></li>
+      <li><a href="#load_os_env_variables">load_os_env_variables</a></li>
+      <li><a href="#sdaf_ssh_key_from_keyvault">sdaf_ssh_key_from_keyvault</a></li>
+      <li><a href="#serial_console_diag_banner">serial_console_diag_banner</a></li>
+      <li><a href="#sdaf_execute_deployment">sdaf_execute_deployment</a></li>
+      <li><a href="#get_sdaf_deployment_command">get_sdaf_deployment_command</a></li>
+      <li><a href="#prepare_sdaf_project">prepare_sdaf_project</a></li>
+      <li><a href="#resource_group_exists">resource_group_exists</a></li>
+      <li><a href="#sdaf_execute_remover">sdaf_execute_remover</a></li>
+      <li><a href="#sdaf_cleanup">sdaf_cleanup</a></li>
+      <li><a href="#sdaf_execute_playbook">sdaf_execute_playbook</a></li>
+      <li><a href="#sdaf_ansible_verbosity_level">sdaf_ansible_verbosity_level</a></li>
+      <li><a href="#get_sdaf_instance_id">get_sdaf_instance_id</a></li>
+      <li><a href="#ansible_show_status">ansible_show_status</a></li>
+      <li><a href="#ansible_execute_command">ansible_execute_command</a></li>
+      <li><a href="#playbook_settings">playbook_settings</a></li>
+      <li><a href="#sdaf_register_byos">sdaf_register_byos</a></li>
+    </ul>
+  </li>
+</ul><h1>lib/sles4sap/sap_deployment_automation_framework/deployment.pm</h1>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Library with common functions for Microsoft SDAF deployment automation. Documentation can be found on the <a href="https://learn.microsoft.com/en-us/azure/sap/automation/get-started">projects official website</a></p>
+
+<p>Github repositories: <a href="https://github.com/Azure/sap-automation/tree/main">Automation scripts</a> <a href="https://github.com/Azure/SAP-automation-samples/tree/main">Sample configurations</a></p>
+
+<p>Basic terminology:</p>
+
+<ul>
+
+<li><p><b>SDAF</b>: SAP deployment automation framework</p>
+
+</li>
+<li><p><b>Control plane</b>: Common term for Resource groups <b>Deployer</b> and <b>Library</b>. Generally it is part of a permanent infrastructure in the cloud.</p>
+
+</li>
+<li><p><b>Deployer</b>: Resource group providing services such as keyvault, Deployer VM and associated resources.</p>
+
+</li>
+<li><p><b>Deployer VM</b>: Central point that contains SDAF installation and where the deployment is executed from. Since SUT VMs have no public IPs, this is also serving as a jump-host to reach them via SSH.</p>
+
+</li>
+<li><p><b>Library</b>: Resource group providing storage for terraform state files, SAP media and private DNS zone.</p>
+
+</li>
+<li><p><b>Workload zone</b>: Resource group that provides services similar to support server.</p>
+
+</li>
+<li><p><b>SAP Systems</b>: Resource group containing SAP SUTs and related resources.</p>
+
+</li>
+</ul>
+
+<h2 id="log_command_output">log_command_output</h2>
+
+<pre><code>log_command_output(command=&gt;$command, log_file=&gt;$log_file);</code></pre>
+
+<p>Using <code>&#39;tee&#39;</code> to redirect command output into log does not return code for executed command, but execution of <code>&#39;tee&#39;</code> itself. This function transforms given command so the RC reflects exit code of the command itself instead of <code>&#39;tee&#39;</code>. Function returns only string with transformed command, nothing is being executed.</p>
+
+<p>Command structure: &quot;(command_to_execute 2&gt;$1 | tee /log/file.log; exit ${PIPESTATUS[0]})&quot;</p>
+
+<pre><code>&#39;exit ${PIPESTATUS[0]}&#39; - returns &#39;command_to_execute&#39; return code instead of one from &#39;tee&#39;
+(...) - puts everything into subshell to prevent &#39;exit&#39; logging out of current shell
+tee - writes output also into the log file</code></pre>
+
+<ul>
+
+<li><p><b>command</b>: Command which output should be logged into file.</p>
+
+</li>
+<li><p><b>log_file</b>: Full log file path and filename to pipe command output into.</p>
+
+</li>
+</ul>
+
+<h2 id="az_login">az_login</h2>
+
+<pre><code>az_login();</code></pre>
+
+<p>Logs into azure account using SPN credentials. Those are not typed directly into the command but using OS env variables. To avoid exposure of credentials in serial console, there is a special temporary file used which contains required variables.</p>
+
+<p>SPN credentials are defined by secret OpenQA parameters:</p>
+
+<ul>
+
+<li><p><b>_SECRET_AZURE_SDAF_APP_ID</b></p>
+
+</li>
+<li><p><b>_SECRET_AZURE_SDAF_APP_PASSWORD</b></p>
+
+</li>
+<li><p><b>_SECRET_AZURE_SDAF_TENANT_ID</b></p>
+
+</li>
+</ul>
+
+<p>SDAF needs SPN credentials with special permissions. Check link below for details. <a href="https://learn.microsoft.com/en-us/azure/sap/automation/deploy-control-plane?tabs=linux#prepare-the-deployment-credentials">https://learn.microsoft.com/en-us/azure/sap/automation/deploy-control-plane?tabs=linux#prepare-the-deployment-credentials</a></p>
+
+<h2 id="create_sdaf_os_var_file">create_sdaf_os_var_file</h2>
+
+<pre><code>create_sdaf_os_var_file($entries);</code></pre>
+
+<p>Creates a simple file with bash env variables and uploads it to the target host without revealing content in serial console. File is sourced afterwards. For detailed variable description check : <a href="https://learn.microsoft.com/en-us/azure/sap/automation/naming">https://learn.microsoft.com/en-us/azure/sap/automation/naming</a></p>
+
+<ul>
+
+<li><p><b>$entries</b>: ARRAYREF of entries to be appended to variable source file</p>
+
+</li>
+</ul>
+
+<h2 id="set_os_variable">set_os_variable</h2>
+
+<pre><code>set_os_variable($variable_name, $variable_value);</code></pre>
+
+<p>Adds or replaces existing OS env variable value in env variable file (see function &#39;set_common_sdaf_os_env()&#39;). File is sourced afterwards to load the value. Croaks with incorrect usage.</p>
+
+<p><b>WARNING</b>: This is executed via &#39;assert_script_run&#39; therefore output will be visible in logs</p>
+
+<ul>
+
+<li><p><b>$variable_name</b>: Variable name</p>
+
+</li>
+<li><p><b>$variable_value</b>: Variable value. Empty value is accepted as well.</p>
+
+</li>
+</ul>
+
+<h2 id="get_os_variable">get_os_variable</h2>
+
+<pre><code>get_os_variable($variable_name);</code></pre>
+
+<p>Returns value of requested OS env variable name. Variable is acquired using <code>&#39;echo&#39;</code> command and is visible in serial terminal output. Keep in mind, this variable is only active until logout.</p>
+
+<ul>
+
+<li><p><b>$variable_name</b>: Variable name</p>
+
+</li>
+</ul>
+
+<h2 id="set_common_sdaf_os_env">set_common_sdaf_os_env</h2>
+
+<pre><code>set_common_sdaf_os_env(
+    subscription_id=&gt;$subscription_id
+    [, env_code=&gt;$env_code]
+    [, deployer_vnet_code=&gt;$deployer_vnet_code]
+    [, sdaf_region_code=&gt;$sdaf_region_code]
+    [, sap_sid=&gt;$sap_sid]
+    [, sdaf_tfstate_storage_account=$sdaf_tfstate_storage_account]
+    [, sdaf_key_vault=&gt;$sdaf_key_vault]
+);</code></pre>
+
+<p>Creates a file with common OS env variables required to run SDAF. File is sourced afterwards to make the values active. Keep in mind that values are lost after user logout (for example after disconnecting console redirection). You can load them back using <i>load_os_env_variables()</i> function OS env variables are core of how to execute SDAF and many are used even internally by SDAF code. For detailed variable description check : <a href="https://learn.microsoft.com/en-us/azure/sap/automation/naming">https://learn.microsoft.com/en-us/azure/sap/automation/naming</a></p>
+
+<ul>
+
+<li><p><b>subscription_id</b>: Azure subscription ID</p>
+
+</li>
+<li><p><b>env_code</b>: Code for SDAF deployment env. Default: &#39;SDAF_ENV_CODE&#39;</p>
+
+</li>
+<li><p><b>deployer_vnet_code</b>: Deployer virtual network code. Default: &#39;SDAF_DEPLOYER_VNET_CODE&#39;</p>
+
+</li>
+<li><p><b>sdaf_region_code</b>: SDAF internal code for azure region. Default: &#39;PUBLIC_CLOUD_REGION&#39; - converted to SDAF format</p>
+
+</li>
+<li><p><b>sap_sid</b>: SAP system ID. Default: &#39;SAP_SID&#39;</p>
+
+</li>
+<li><p><b>sdaf_tfstate_storage_account</b>: Storage account residing in library resource group. Location for stored tfstate files. Default &#39;SDAF_TFSTATE_STORAGE_ACCOUNT&#39;</p>
+
+</li>
+<li><p><b>sdaf_key_vault</b>: Key vault name inside Deployer resource group. Default &#39;SDAF_DEPLYOER_KEY_VAULT&#39;</p>
+
+</li>
+</ul>
+
+<h2 id="load_os_env_variables">load_os_env_variables</h2>
+
+<pre><code>load_os_env_variables();</code></pre>
+
+<p>Sources file containing OS env variables required for executing SDAF. Currently deployer VM is a permanent installation with all tests using it. Therefore using .bashrc file for storing variables is not an option since tests would constantly overwrite variables between each other.</p>
+
+<h2 id="sdaf_ssh_key_from_keyvault">sdaf_ssh_key_from_keyvault</h2>
+
+<pre><code>sdaf_ssh_key_from_keyvault(key_vault=&gt;$key_vault [, target_file=&gt;&#39;/path/to/glory/and_happiness&#39;]);</code></pre>
+
+<p>Retrieves public and private ssh key from specified keyvault and sets up permissions.</p>
+
+<ul>
+
+<li><p><b>key_vault</b>: Key vault name</p>
+
+</li>
+<li><p><b>target_file</b>: Full file path, where to write the public key. Default &#39;~/.ssh/id_rsa&#39;</p>
+
+</li>
+</ul>
+
+<h2 id="serial_console_diag_banner">serial_console_diag_banner</h2>
+
+<pre><code>serial_console_diag_banner($input_text);</code></pre>
+
+<p>Prints a banner in serial console that highlights a point in output to make it more readable. Can be used for example to mark start and end of a function or a point in test so it is easier to find while debugging. Below is an example of the printed banner: # # $input_text #</p>
+
+<ul>
+
+<li><p><b>input_text</b>: string that will be printed in uppercase surrounded by &#39;#&#39; to make it more visible in output</p>
+
+</li>
+</ul>
+
+<h2 id="sdaf_execute_deployment">sdaf_execute_deployment</h2>
+
+<pre><code>sdaf_execute_deployment(deployment_type=&gt;$deployment_type [, timeout=&gt;$timeout]);</code></pre>
+
+<p>Executes SDAF deployment according to the type specified. Croaks with unsupported deployment type, dies upon command failure. <a href="https://learn.microsoft.com/en-us/azure/sap/automation/deploy-workload-zone?tabs=linux#deploy-the-sap-workload-zone">https://learn.microsoft.com/en-us/azure/sap/automation/deploy-workload-zone?tabs=linux#deploy-the-sap-workload-zone</a> <a href="https://learn.microsoft.com/en-us/azure/sap/automation/tutorial#deploy-the-sap-system-infrastructure">https://learn.microsoft.com/en-us/azure/sap/automation/tutorial#deploy-the-sap-system-infrastructure</a></p>
+
+<ul>
+
+<li><p><b>deployment_type</b>: Type of the deployment: workload_zone or sap_system</p>
+
+</li>
+<li><p><b>timeout</b>: Execution timeout. Default: 1800s.</p>
+
+</li>
+<li><p><b>retries</b>: Number of attempts to execute deployment in case of failure. Default: 3</p>
+
+</li>
+</ul>
+
+<h2 id="get_sdaf_deployment_command">get_sdaf_deployment_command</h2>
+
+<pre><code>get_sdaf_deployment_command(deployment_type=&gt;$deployment_type, tfvars_filename=&gt;tfvars_filename);</code></pre>
+
+<p>Function composes SDAF deployment script command for <b>sap_system</b> or <b>workload_zone</b> according to official documentation. Although the documentation uses env OS variable references in the command, function replaces them with actual values. This is done for better debugging and logging transparency. Only sensitive values are hidden by using references.</p>
+
+<ul>
+
+<li><p><b>deployment_type</b>: Type of the deployment: workload_zone or sap_system</p>
+
+</li>
+<li><p><b>tfvars_filename</b>: Filename of tfvars file</p>
+
+</li>
+</ul>
+
+<h2 id="prepare_sdaf_project">prepare_sdaf_project</h2>
+
+<pre><code>prepare_sdaf_project(
+     [, env_code=&gt;$env_code]
+     [, sdaf_region_code=&gt;$sdaf_region_code]
+     [, deployer_vnet_code=&gt;$deployer_vnet_code]
+     [, sap_sid=&gt;$sap_sid]);</code></pre>
+
+<p>Prepares directory structure and Clones git repository for SDAF samples and automation code.</p>
+
+<ul>
+
+<li><p><b>env_code</b>: Code for SDAF deployment env. Default: &#39;SDAF_ENV_CODE&#39;</p>
+
+</li>
+<li><p><b>deployer_vnet_code</b>: Deployer virtual network code. Default &#39;SDAF_DEPLOYER_VNET_CODE&#39;</p>
+
+</li>
+<li><p><b>sdaf_region_code</b>: SDAF internal code for azure region. Default: &#39;PUBLIC_CLOUD_REGION&#39; converted to SDAF format</p>
+
+</li>
+<li><p><b>sap_sid</b>: SAP system ID. Default &#39;SAP_SID&#39;</p>
+
+</li>
+</ul>
+
+<h2 id="resource_group_exists">resource_group_exists</h2>
+
+<pre><code>resource_group_exists($resource_group);</code></pre>
+
+<p>Checks if resource group exists. Function accepts only full resource name. Croaks if command does not return true/false value.</p>
+
+<ul>
+
+<li><p><b>$resource_group</b>: Resource group name to check</p>
+
+</li>
+</ul>
+
+<h2 id="sdaf_execute_remover">sdaf_execute_remover</h2>
+
+<pre><code>sdaf_execute_remover(deployment_type=&gt;$deployment_type);</code></pre>
+
+<p>Uses remover.sh script which is part of the SDAF project. This script can be used only on workload zone or sap system. Control plane and library have separate removal script, but are currently part of permanent setup and should not be destroyed. Returns RC to allow additional cleanup tasks required even after script failure. <a href="https://learn.microsoft.com/en-us/azure/sap/automation/bash/remover">https://learn.microsoft.com/en-us/azure/sap/automation/bash/remover</a></p>
+
+<ul>
+
+<li><p><b>$deployment_type</b>: Type of the deployment (workload_zone, sap_system)</p>
+
+</li>
+</ul>
+
+<h2 id="sdaf_cleanup">sdaf_cleanup</h2>
+
+<pre><code>sdaf_cleanup();</code></pre>
+
+<p>Performs full cleanup routine for <b>sap systems</b> and <b>workload zone</b> by executing SDAF remover.sh file. Deletes all files related to test run on deployer VM, even in case remover script fails. Resource groups need to be deleted manually in case of failure.</p>
+
+<h2 id="sdaf_execute_playbook">sdaf_execute_playbook</h2>
+
+<pre><code>sdaf_execute_playbook(
+    playbook_filename=&gt;&#39;playbook_04_00_01_db_ha.yaml&#39;,
+    sdaf_config_root_dir=&gt;&#39;/path/to/joy/and/happiness/&#39;
+    sap_sid=&gt;&#39;ABC&#39;,
+    timeout=&gt;&#39;42&#39;,
+    verbosity_level=&gt;&#39;3&#39;
+    );</code></pre>
+
+<p>Execute playbook specified by <b>playbook_filename</b> and record command output in separate log file. Verbosity level of <b>ansible-playbook</b> is controlled by openQA parameter <b>SDAF_ANSIBLE_VERBOSITY_LEVEL</b>. If undefined, it will use standard output without adding any <b>-v</b> flag. See function <b>sdaf_execute_playbook</b> for details.</p>
+
+<ul>
+
+<li><p><b>playbook_filename</b>: Filename of the playbook to be executed.</p>
+
+</li>
+<li><p><b>sdaf_config_root_dir</b>: SDAF Config directory containing SUT ssh keys</p>
+
+</li>
+<li><p><b>sap_sid</b>: SAP system ID. Default &#39;SAP_SID&#39;</p>
+
+</li>
+<li><p><b>timeout</b>: Timeout for executing playbook. Passed into asset_script_run. Default: 1800s</p>
+
+</li>
+<li><p><b>$verbosity_level</b>: Change default verbosity value by either anything equal to &#39;true&#39; or int between 1-6. Default: false</p>
+
+</li>
+</ul>
+
+<h2 id="sdaf_ansible_verbosity_level">sdaf_ansible_verbosity_level</h2>
+
+<pre><code>sdaf_ansible_verbosity_level($verbosity_level);</code></pre>
+
+<p>Returns string that is to be used as verbosity parameter <b>-v</b> for &#39;ansible-playbook&#39; command. This is controlled by positional argument <b>$verbosity_level</b>. Values can specify verbosity level using integer up to 6 (max supported by ansible) or just set to anything equal to <b>&#39;true&#39;</b> which will default to <b>-vvvv</b>. Value <b>-vvvv</b> should be enough to debug network connection problems according to ansible documentation: <a href="https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html#cmdoption-ansible-playbook-v">https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html#cmdoption-ansible-playbook-v</a></p>
+
+<ul>
+
+<li><p><b>$verbosity_level</b>: Change default verbosity value by either anything equal to &#39;true&#39; or int between 1-6. Default: false</p>
+
+</li>
+</ul>
+
+<h2 id="get_sdaf_instance_id">get_sdaf_instance_id</h2>
+
+<pre><code>get_sdaf_instance_id(pattern=&gt;[&#39;SCS&#39;, &#39;ERS&#39;, &#39;PAS&#39;]);</code></pre>
+
+<p>Get instance id number from SAP_SYSTEM.tfvar.</p>
+
+<ul>
+
+<li><p><b>pattern</b>: SDAF SAP Central Services pattern</p>
+
+</li>
+</ul>
+
+<h2 id="ansible_show_status">ansible_show_status</h2>
+
+<pre><code>ansible_show_status(scenarios=&gt;[&#39;db_install&#39;, &#39;db_ha&#39;] sdaf_config_root_dir=&gt;&#39;/some/path&#39; [, sap_sid=&gt;&#39;CAT&#39;]);</code></pre>
+
+<p>Display simple command outputs from all DB hosts using <b>ansible</b> command.</p>
+
+<ul>
+
+<li><p><b>sdaf_config_root_dir</b>: SDAF Config directory containing SUT ssh keys</p>
+
+</li>
+<li><p><b>sap_sid</b>: SAP system ID. Default &#39;SAP_SID&#39;</p>
+
+</li>
+<li><p><b>scenarios</b>: ARRAYREF with list of installed components</p>
+
+</li>
+</ul>
+
+<h2 id="ansible_execute_command">ansible_execute_command</h2>
+
+<pre><code>ansible_execute_command(
+    command=&gt;&#39;rm -Rf /&#39;, host_group=&gt;&#39;QES_SCS&#39;, sdaf_config_root_dir=&gt;&#39;/some/path&#39; , sap_sid=&gt;&#39;CAT&#39;);</code></pre>
+
+<p>Execute command on host group using ansible. Returns execution output.</p>
+
+<ul>
+
+<li><p><b>sdaf_config_root_dir</b>: SDAF Config directory containing SUT ssh keys</p>
+
+</li>
+<li><p><b>sap_sid</b>: SAP system ID. Default &#39;SAP_SID&#39;</p>
+
+</li>
+<li><p><b>host_group</b>: Host group name from inventory file</p>
+
+</li>
+<li><p><b>command</b>: Command to be executed</p>
+
+</li>
+<li><p><b>verbose</b>: verbose ansible output</p>
+
+</li>
+<li><p><b>proceed_on_failure</b>: proceed on failure setting</p>
+
+</li>
+</ul>
+
+<h2 id="playbook_settings">playbook_settings</h2>
+
+<pre><code>playbook_settings(components=&gt;[&#39;db_install&#39;, &#39;db_ha&#39;]);</code></pre>
+
+<p>Display simple command outputs from all DB hosts using <b>ansible</b> command.</p>
+
+<ul>
+
+<li><p><b>components</b>: <b>ARRAYREF</b> of components that should be installed</p>
+
+</li>
+</ul>
+
+<h2 id="sdaf_register_byos">sdaf_register_byos</h2>
+
+<pre><code>sdaf_register_byos(sdaf_config_root_dir=&gt;&#39;/stairway/to_heaven&#39;, scc_reg_code=&gt;&#39;CODE-XYZ&#39;, sap_sid=&#39;PRD&#39;);</code></pre>
+
+<p>Performs SCC registration on BYOS image using <b>registercloudguest</b> method.</p>
+
+<ul>
+
+<li><p><b>sdaf_config_root_dir</b>: SDAF root configuration directory</p>
+
+</li>
+<li><p><b>scc_reg_code</b>: SCC registration code</p>
+
+</li>
+<li><p><b>sap_sid</b>: SAP system ID</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

@@ -15,8 +15,14 @@
   <li>
     <ul>
       <li><a href="#check_port_state">check_port_state</a></li>
+      <li><a href="#is_registered_system">is_registered_system</a></li>
+      <li><a href="#do_system_registration">do_system_registration</a></li>
+      <li><a href="#check_system_registration">check_system_registration</a></li>
       <li><a href="#subscribe_extensions_and_modules">subscribe_extensions_and_modules</a></li>
       <li><a href="#is_sev_es_guest">is_sev_es_guest</a></li>
+      <li><a href="#get_guest_regcode">get_guest_regcode</a></li>
+      <li><a href="#execute_over_ssh">execute_over_ssh</a></li>
+      <li><a href="#reboot_virtual_machine">reboot_virtual_machine</a></li>
     </ul>
   </li>
 </ul><h1>lib/virt_autotest/utils.pm</h1>
@@ -27,17 +33,54 @@
 
 <p>Check whether given port is open on remote machine. This subroutine accepts four arguments, dst_machine, dst_port, retries and delay, which are fqdn or ip addr of remote machine, port on remote machine, the number of retries and delay value respectively. Default retries is 1 and default delay is 30 seconds. dst_machine and dst_port have no default value and test will die if the subroutine is called without being passed value to dst_machine or dst_port.The subroutine will return 1 if the given port is open on the specified remote machine, otherwise it will return 0.</p>
 
+<h2 id="is_registered_system">is_registered_system</h2>
+
+<pre><code>is_registered_system(dst_machine =&gt; $machine)</code></pre>
+
+<p>Detect whether system under test is registered. If [dst_machine] is not given, the default value &#39;localhost&#39; will be used. Using &quot;transactional-update register&quot; if 1 is given to [usetrup], otherwise keeping using SUSEConnect.</p>
+
+<h2 id="do_system_registration">do_system_registration</h2>
+
+<pre><code>do_system_registration(dst_machine =&gt; $machine, activate =&gt; 1/0)</code></pre>
+
+<p>Register/de-register system according to argument [activate]. If argument [dst_machine] is not given, the default value &#39;localhost&#39; will be used. Using &quot;transactional-update register&quot; if 1 is given to [usetrup], otherwise keeping using SUSEConnect.</p>
+
+<h2 id="check_system_registration">check_system_registration</h2>
+
+<pre><code>check_system_registration(dst_machine =&gt; $machine)</code></pre>
+
+<p>Check current system registration status. If argument [dst_machine] is not given, the default value &#39;localhost&#39; will be used. Using &quot;transactional-update register&quot; if 1 is given to [usetrup], otherwise keeping using SUSEConnect.</p>
+
 <h2 id="subscribe_extensions_and_modules">subscribe_extensions_and_modules</h2>
 
 <pre><code>subscribe_extensions_and_modules(dst_machine =&gt; $machine, activate =&gt; 1/0, reg_exts =&gt; $exts)</code></pre>
 
-<p>Any available extensions and modules listed out by SUSEConnect --list-extensions that do not require additional regcode can be subscribe directly by using command SUSEConnect -p [extension or module]. Subscription is to be performed on localhost by default if argument dst_machine is not given any other address, and successful access to dst_machine via ssh should be guaranteed in advance if dst_machine points to a remote machine. Deactivation is also supported if argument activate is given 0 explicitly. Multiple extensions or modules can be passed in as a single string separated by space to argument reg_exts to be subscribed one by one.</p>
+<p>Any available extensions and modules listed out by SUSEConnect --list-extensions that do not require additional regcode can be subscribe directly by using command SUSEConnect -p [extension or module]. Subscription is to be performed on localhost by default if argument dst_machine is not given any other address, and successful access to dst_machine via ssh should be guaranteed in advance if dst_machine points to a remote machine. Deactivation is also supported if argument activate is given 0 explicitly. Multiple extensions or modules can be passed in as a single string separated by space to argument reg_exts to be subscribed one by one. Using &quot;transactional-update register&quot; for newer OS like SLE Micro 6.0, which is the more preferred way to do registration.</p>
 
 <h2 id="is_sev_es_guest">is_sev_es_guest</h2>
 
 <pre><code>is_sev_es_guest($guest_name)</code></pre>
 
 <p>Check whether a guest is sev-es, sev only or not sev/sev-es guest by searching whether sev-es or sev word is available in its name. The only argument for the subroutine is guest_name. It returns sev-es or sev if either is found in guest name, otherwise it returns 0.</p>
+
+<h2 id="get_guest_regcode">get_guest_regcode</h2>
+
+<pre><code>get_guest_regcode(separator =&gt; &#39;string separator&#39;)</code></pre>
+
+<p>Pass guest registration code in dynamically via GUEST_SCC_REGCODE and GUEST_SCC_REGCODE_LTSS. If they are not provided, SCC_REGCODE and SCC_REGCODE_LTSS_15 will be used. If there are multiple guest patterns , their corresponding registration codes should also be specified in the same order and separated by separators like pipe, comma or others. Empty value is allowed. For example, regcode_guest1|regcode_guest2|| regcode_guest4, because regcode_guest3 is emety, empty value is passed in to preserve order. For multiple guest patterns, an empty registration code for specific guest pattern will not be filled out by any default value and at the same time this means registration code is not needed for it at all. This subroutine has one argument separator and returns generated registration codes joined together by specified separator.</p>
+
+<h2 id="execute_over_ssh">execute_over_ssh</h2>
+
+<pre><code>execute_over_ssh(username =&gt; $user, address =&gt; $address,
+    command =&gt; $command, timeout =&gt; $timeout, assert =&gt; $assert)</code></pre>
+
+<p>Run command over passwordless ssh session. Arguments include username default value of which is &#39;root&#39;, address which can take the form of FQDN or IP and is mandatory, command to be executed, timeout value to wait before next step and assert which determines assertive call or not.</p>
+
+<h2 id="reboot_virtual_machine">reboot_virtual_machine</h2>
+
+<pre><code>reboot_virtual_machine(username =&gt; $user, address =&gt; $address, domain =&gt; $domain)</code></pre>
+
+<p>Reboot virtual machine by issuing &#39;reboot&#39; over ssh and then &#39;virsh command&#39; if &#39;reboot&#39; does not succeed and virtual machine domain name is given as arguement domain which is default to argument address if it is also a domain name. Address can also takes the form of FQDN and IP as long as it is reachable over ssh. And another argument username has the default value of &#39;root&#39; if no passed in value.</p>
 
 
 </body>

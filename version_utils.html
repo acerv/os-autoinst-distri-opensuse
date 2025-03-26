@@ -27,12 +27,15 @@
       <li><a href="#is_microos">is_microos</a></li>
       <li><a href="#is_leap_micro">is_leap_micro</a></li>
       <li><a href="#is_sle_micro">is_sle_micro</a></li>
+      <li><a href="#is_micro">is_micro</a></li>
       <li><a href="#is_alp">is_alp</a></li>
       <li><a href="#is_selfinstall">is_selfinstall</a></li>
       <li><a href="#is_tumbleweed">is_tumbleweed</a></li>
+      <li><a href="#is_slowroll">is_slowroll</a></li>
       <li><a href="#is_leap">is_leap</a></li>
       <li><a href="#is_opensuse">is_opensuse</a></li>
       <li><a href="#is_sle">is_sle</a></li>
+      <li><a href="#is_sled">is_sled</a></li>
       <li><a href="#is_transactional">is_transactional</a></li>
       <li><a href="#is_sles4migration">is_sles4migration</a></li>
       <li><a href="#is_sles4sap">is_sles4sap</a></li>
@@ -60,17 +63,24 @@
       <li><a href="#uses_qa_net_hardware">uses_qa_net_hardware</a></li>
       <li><a href="#get_os_release">get_os_release</a></li>
       <li><a href="#check_os_release">check_os_release</a></li>
+      <li><a href="#verify_os_version">verify_os_version</a></li>
       <li><a href="#is_public_cloud">is_public_cloud</a></li>
       <li><a href="#is_openstack">is_openstack</a></li>
       <li><a href="#is_leap_migration">is_leap_migration</a></li>
       <li><a href="#is_tunneled">is_tunneled</a></li>
+      <li><a href="#is_bootloader_grub2">is_bootloader_grub2</a></li>
+      <li><a href="#is_bootloader_sdboot">is_bootloader_sdboot</a></li>
+      <li><a href="#is_bootloader_grub2_bls">is_bootloader_grub2_bls</a></li>
+      <li><a href="#is_plasma6">is_plasma6</a></li>
       <li><a href="#has_test_issues">has_test_issues</a></li>
       <li><a href="#package_version_cmp">package_version_cmp</a></li>
       <li><a href="#is_quarterly_iso">is_quarterly_iso</a></li>
       <li><a href="#get_version_id">get_version_id</a></li>
+      <li><a href="#is_community_jeos">is_community_jeos</a></li>
+      <li><a href="#has_selinux_by_default">has_selinux_by_default</a></li>
+      <li><a href="#is_agama">is_agama</a></li>
     </ul>
   </li>
-  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul><h1>lib/version_utils.pm</h1>
 
 <h1 id="VERSION_UTILS">VERSION_UTILS</h1>
@@ -105,7 +115,7 @@
 
 <h2 id="is_virtualization_server">is_virtualization_server</h2>
 
-<p>Returns true if called on a virutalization server</p>
+<p>Returns true if called on a virtualization server</p>
 
 <h2 id="is_livecd">is_livecd</h2>
 
@@ -113,7 +123,7 @@
 
 <h2 id="check_version">check_version</h2>
 
-<p>Usage: check_version(&#39;&gt;15.0&#39;, get_var(&#39;VERSION&#39;), &#39;\d{2}&#39;) Query format: [= &gt; &lt; &gt;= &lt;=] version [+] (Example: &lt;=12-sp3 =12-sp1 &lt;4.0 &gt;=15 3.0+) Check agains: product version to check against - probably get_var(&#39;VERSION&#39;) Regex format: checks query version format (Example: /\d{2}\.\d/)#</p>
+<p>Usage: check_version(&#39;&gt;15.0&#39;, get_var(&#39;VERSION&#39;), &#39;\d{2}&#39;) Query format: [= &gt; &lt; &gt;= &lt;=] version [+] (Example: &lt;=12-sp3 =12-sp1 &lt;4.0 &gt;=15 3.0+) Check against: product version to check against - probably get_var(&#39;VERSION&#39;) Regex format: checks query version format (Example: /\d{2}\.\d/)#</p>
 
 <h2 id="is_microos">is_microos</h2>
 
@@ -127,6 +137,10 @@
 
 <p>Check if distribution is SUSE Linux Enterprise Micro</p>
 
+<h2 id="is_micro">is_micro</h2>
+
+<p>Check if distribution is any of MicroOS, Leap Micro or SL-Micro</p>
+
 <h2 id="is_alp">is_alp</h2>
 
 <p>Check if distribution is ALP</p>
@@ -139,6 +153,10 @@
 
 <p>Returns true if called on tumbleweed</p>
 
+<h2 id="is_slowroll">is_slowroll</h2>
+
+<p>Returns true if called on slowroll</p>
+
 <h2 id="is_leap">is_leap</h2>
 
 <p>Check if distribution is Leap with optional filter for: Version: &lt;=42.2 =15.0 &gt;15.0 &gt;=42.3 15.0+</p>
@@ -150,6 +168,10 @@
 <h2 id="is_sle">is_sle</h2>
 
 <p>Check if distribution is SLE with optional filter for: Version: &lt;=12-sp3 =12-sp1 &gt;11-sp1 &gt;=15 15+ (&gt;=15 and 15+ are equivalent)</p>
+
+<h2 id="is_sled">is_sled</h2>
+
+<p>Check if distribution is SLED</p>
 
 <h2 id="is_transactional">is_transactional</h2>
 
@@ -265,7 +287,7 @@
 
 <h2 id="get_os_release">get_os_release</h2>
 
-<p>Get SLE release version, service pack and distribution name info from any running sles os without any dependencies It parses the info from /etc/os-release file, which can reside in any physical host or virtual machine The file can also be placed anywhere as long as it can be reached somehow by its absolute file path, which should be passed in as the second argument os_release_file, for example, &quot;/etc/os-release&quot; At the same time, connection method to the entity in which the file reside should be passed in as the firt argument go_to_target, for example, &quot;ssh root at name or ip address&quot; or &quot;way to download the file&quot; For use only on locahost, no argument needs to be specified</p>
+<p>Get SLE release version, service pack and distribution name info from any running sles os without any dependencies It parses the info from /etc/os-release file, which can reside in any physical host or virtual machine The file can also be placed anywhere as long as it can be reached somehow by its absolute file path, which should be passed in as the second argument os_release_file, for example, &quot;/etc/os-release&quot; At the same time, connection method to the entity in which the file reside should be passed in as the first argument go_to_target, for example, &quot;ssh root at name or ip address&quot; or &quot;way to download the file&quot; For use only on locahost, no argument needs to be specified</p>
 
 <h2 id="check_os_release">check_os_release</h2>
 
@@ -273,33 +295,29 @@
 
 <dl>
 
-<dt id="distri_name"><code>distri_name</code></dt>
+<dt id="distri_name---The-expected-distribution-name-to-compare"><code>distri_name</code> - The expected distribution name to compare.</dt>
 <dd>
-
-<p>The expected distribution name to compare.</p>
 
 </dd>
-<dt id="line"><code>line</code></dt>
+<dt id="line---The-line-well-be-parsing-and-checking"><code>line</code> - The line we&#39;ll be parsing and checking.</dt>
 <dd>
-
-<p>The line we&#39;ll be parsing and checking.</p>
 
 </dd>
-<dt id="go_to_target"><code>go_to_target</code></dt>
+<dt id="go_to_target---Command-connecting-to-the-SUT"><code>go_to_target</code> - Command connecting to the SUT</dt>
 <dd>
-
-<p>Command connecting to the SUT</p>
 
 </dd>
-<dt id="os_release_file"><code>os_release_file</code></dt>
+<dt id="os_release_file---The-full-path-to-the-Operating-system-identification-file.-Default-to-etc-os-release"><code>os_release_file</code> - The full path to the Operating system identification file. Default to <i>/etc/os-release</i>.</dt>
 <dd>
-
-<p>The full path to the Operating system identification file. Default to <i>/etc/os-release</i>.</p>
 
 <p>Returns 1 (true) if the ID_LIKE variable contains <code>distri_name</code>.</p>
 
 </dd>
 </dl>
+
+<h2 id="verify_os_version">verify_os_version</h2>
+
+<p>Returns 1 (true) if os release version matches the one passed as arguement. If no arguements are given, the function will compare the os release version in /etc/os-release file with &quot;VERSION&quot; var.</p>
 
 <h2 id="is_public_cloud">is_public_cloud</h2>
 
@@ -307,7 +325,7 @@
 
 <h2 id="is_openstack">is_openstack</h2>
 
-<p>Returns true if JEOS_OPENSTACK is set to 1</p>
+<p>Returns true if the tests loads Cloud image in OpenStack environment NO_CLOUD variable is set in order to test the image in QEMU</p>
 
 <h2 id="is_leap_migration">is_leap_migration</h2>
 
@@ -316,6 +334,22 @@
 <h2 id="is_tunneled">is_tunneled</h2>
 
 <p>Returns true if TUNNELED is set to 1</p>
+
+<h2 id="is_bootloader_grub2">is_bootloader_grub2</h2>
+
+<p>Returns true if the SUT uses GRUB2 as bootloader</p>
+
+<h2 id="is_bootloader_sdboot">is_bootloader_sdboot</h2>
+
+<p>Returns true if the SUT uses systemd-boot as bootloader</p>
+
+<h2 id="is_bootloader_grub2_bls">is_bootloader_grub2_bls</h2>
+
+<p>Returns true if the SUT uses GRUB2-BLS as bootloader</p>
+
+<h2 id="is_plasma6">is_plasma6</h2>
+
+<p>Returns true if the SUT uses Plasma 6.</p>
 
 <h2 id="has_test_issues">has_test_issues</h2>
 
@@ -327,7 +361,7 @@
 
 <h2 id="is_quarterly_iso">is_quarterly_iso</h2>
 
-<p>Returns true if called in quaterly iso testing</p>
+<p>Returns true if called in quarterly iso testing</p>
 
 <h2 id="get_version_id">get_version_id</h2>
 
@@ -337,25 +371,17 @@
 
 <p>The default location that contains VERSION_ID is file /etc/os-release if nothing else is passed in to argument verid_file.</p>
 
-<h1 id="POD-ERRORS">POD ERRORS</h1>
+<h2 id="is_community_jeos">is_community_jeos</h2>
 
-<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+<p>Returns true for tests using the images built by the &quot;JeOS&quot; package on OBS</p>
 
-<dl>
+<h2 id="has_selinux_by_default">has_selinux_by_default</h2>
 
-<dt id="Around-line-706">Around line 706:</dt>
-<dd>
+<p>Returns true if the distro has SELinux as default MAC</p>
 
-<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
+<h2 id="is_agama">is_agama</h2>
 
-</dd>
-<dt id="Around-line-737">Around line 737:</dt>
-<dd>
-
-<p>You forgot a &#39;=back&#39; before &#39;=head2&#39;</p>
-
-</dd>
-</dl>
+<p>Check if agama installation is being used</p>
 
 
 </body>
