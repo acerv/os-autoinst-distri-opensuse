@@ -26,7 +26,7 @@ sub run {
     my $exclude = get_var('LIBURING_EXCLUDE', '');
     my $issues = get_var('LIBURING_KNOWN_ISSUES', '');
     my $whitelist = LTP::WhiteList->new($issues);
-    my $pkgs = "git-core";
+    my $pkgs = "git-core valgrind";
     my @lines;
     my $out;
 
@@ -45,87 +45,12 @@ sub run {
     }
 
     # download and compile tests
-    assert_script_run("git clone --no-single-branch $repository");
+    assert_script_run("git clone --no-single-branch $repository -b liburing_debug");
     assert_script_run("cd liburing");
-    assert_script_run("git checkout $version");
-    record_info("test version", script_output("git log -1 --oneline"));
     assert_script_run("./configure");
     assert_script_run("make -C src");
     assert_script_run("make -C test");
-
-    # create environment information for known issues check
-    my $environment = {
-        product => get_var('DISTRI') . ':' . get_var('VERSION'),
-        revision => get_var('BUILD'),
-        flavor => get_var('FLAVOR'),
-        arch => get_var('ARCH'),
-        backend => get_var('BACKEND'),
-        kernel => script_output('uname -r'),
-        libc => '',
-        gcc => '',
-        harness => 'SUSE OpenQA',
-        ltp_version => $version
-    };
-
-    # run tests executables
-    my @skipped = $whitelist->list_skipped_tests($environment, 'liburing');
-    if (@skipped) {
-        push @skipped, $exclude if $exclude;
-        my $test_exclude = join(' ', @skipped);
-
-        assert_script_run("echo TEST_EXCLUDE=\"$test_exclude\" > test/config.local");
-        record_info(
-            "Exclude",
-            "Excluding tests: $test_exclude",
-            result => 'softfail'
-        );
-    }
-
-    $out = script_output(
-        "make -C test runtests",
-        timeout => $timeout,
-        proceed_on_failure => 1
-    );
-
-    # search for timed out tests
-    my @timeouts;
-    for my $line ($out =~ /Tests timed out \(\d+\):.*/mg) {
-        push @timeouts, $line =~ /<([\w\-\.]+\.t)>/g;
-    }
-    if (@timeouts) {
-        record_info("Timed-out Tests", join(", ", @timeouts));
-        for my $testname (@timeouts) {
-            unless ($whitelist->override_known_failures(
-                    $self,
-                    $environment,
-                    'liburing',
-                    $testname
-            )) {
-                record_info("Unexpected Timeout", "$testname timed out", result => 'fail');
-                $self->{result} = 'fail';
-            }
-        }
-    }
-
-    # search for failed tests and known issues
-    my @failures;
-    for my $line ($out =~ /Tests failed \(\d+\):.*/mg) {
-        push @failures, $line =~ /<([\w\-\.]+\.t)>/g;
-    }
-    if (@failures) {
-        record_info("Failed Tests", join(", ", @failures));
-        for my $failure (@failures) {
-            unless ($whitelist->override_known_failures(
-                    $self,
-                    $environment,
-                    'liburing',
-                    $failure
-            )) {
-                record_info("Unexpected Failure", "$failure failed", result => 'fail');
-                $self->{result} = 'fail';
-            }
-        }
-    }
+    assert_script_run("make -C test runtests");
 }
 
 sub test_flags {
